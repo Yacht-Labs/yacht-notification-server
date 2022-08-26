@@ -7,10 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Address {
-  pubKey                  String                    @id
+model Account {
+  id                      String                    @id @default(uuid())
+  address                 String
   deviceId                String                    @db.VarChar(255)
   name                    String?
+  isActive                Boolean                   @default(true)
   createdAt               DateTime                  @default(now())
   updatedAt               DateTime                  @updatedAt
   EulerIRNotification     EulerIRNotification[]
@@ -18,20 +20,33 @@ model Address {
 }
 
 model Token {
-  address   String   @id
-  tier      String
-  name      String
-  supplyAPY Float
-  borrowAPY Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  address             String                @id
+  name                String
+  symbol              String
+  price               String
+  decimals            Int
+  EulerIRNotification EulerIRNotification[]
+}
+
+model EulerToken {
+  address          String   @id
+  tier             String
+  supplyAPY        Float
+  borrowAPY        Float
+  borrowFactor     Float
+  collateralFactor Float
+  eulAPY           Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model EulerIRNotification {
   id              String   @id @default(uuid())
-  address         Address  @relation(fields: [addressPubKey], references: [pubKey])
+  account         Account  @relation(fields: [accountId], references: [id])
+  token           Token    @relation(fields: [tokenAddress], references: [address])
   tokenAddress    String   @db.VarChar(255)
-  addressPubKey   String
+  accountId       String
+  deviceId        String   @db.VarChar(255)
   borrowAPY       Float?
   supplyAPY       Float?
   borrowThreshold Int?
@@ -42,11 +57,13 @@ model EulerIRNotification {
 }
 
 model EulerHealthNotification {
-  id             String   @id @default(uuid())
-  address        Address  @relation(fields: [addressPubKey], references: [pubKey])
+  id             String  @id @default(uuid())
+  account        Account @relation(fields: [accountId], references: [id])
   thresholdValue Float
-  isActive       Boolean  @default(true)
-  addressPubKey  String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isActive       Boolean @default(true)
+  accountId      String
+  deviceId       String  @db.VarChar(255)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

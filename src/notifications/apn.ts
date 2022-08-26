@@ -11,14 +11,13 @@ var options = {
 };
 
 const deviceId =
-  "ad3b33e47917d1e1dc388c53849922bb23a79ad93ef7c3ec4d8e7682604c73fe";
+  // "239aea977817554cb944568d1ee7a9dcdb08bd86041574346f0d0943b23035db"; // straus
+  "ad3b33e47917d1e1dc388c53849922bb23a79ad93ef7c3ec4d8e7682604c73fe"; // henry
 var note = new apn.Notification();
 note.expiry = Math.floor(Date.now() / 1000) + 3600;
-note.alert = "No me importa que de something something!";
+note.alert = "URA";
 note.topic = "com.YachtLabs.Yacht";
 
 var apnProvider = new apn.Provider(options);
 
-for (let i = 0; i < 10; i++) {
-  apnProvider.send(note, deviceId).then((data) => console.log(data));
-}
+apnProvider.send(note, deviceId).then((data) => console.log(data));

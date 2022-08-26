@@ -1,9 +1,22 @@
-To run the docker postgres container: 
+To run the docker postgres container:
 `docker run --name yacht-notification-server -p 5432:5432 -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -d postgres`
 
-To create the first database in the server:
+To create the first database in the server open a terminal and enter:
 `docker exec -it yacht-notification-server psql -U user`
+
 Now execute the following code:
 `CREATE DATABASE yacht_db`
 You can confirm that the database was created by entering `\l`
+Exit the terminal with `quit()`
 
+Add the following environment variables to a .env file
+
+```
+DATABASE_URL="postgresql://user:password@localhost:5432/yacht_db?schema=public"
+EULER_GRAPH_ENDPOINT =
+  "https://api.thegraph.com/subgraphs/name/euler-xyz/euler-mainnet";
+```
+
+To initialize the token database, run `npm run db-init`
+
+You should now have token data in your db
