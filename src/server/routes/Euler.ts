@@ -6,9 +6,9 @@ router.get("/tokens", async (req, res) => {
   const tokenData = await db.token.findMany();
   const eulerTokenData = await db.eulerToken.findMany();
   const combinedTokenData = tokenData.map((token) => {
-    const matchedToken = eulerTokenData.find((eulerToken) => {
-      eulerToken.address === token.address;
-    });
+    const matchedToken = eulerTokenData.find(
+      (eulerToken) => eulerToken.address === token.address
+    );
     return {
       ...token,
       ...matchedToken,

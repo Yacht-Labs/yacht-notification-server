@@ -1,2 +1,9 @@
+import { getDbEndpoint } from "./../src/utils/environment";
 import { PrismaClient } from "@prisma/client";
-export default new PrismaClient();
+export default new PrismaClient({
+  datasources: {
+    db: {
+      url: getDbEndpoint(),
+    },
+  },
+});
