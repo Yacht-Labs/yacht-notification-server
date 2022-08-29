@@ -9,7 +9,7 @@ Now execute the following code:
 You can confirm that the database was created by entering `\l`
 Exit the terminal with `quit()`
 
-To set up the databse, run `npm run db-generate`
+To set up the database, run `npm run db-generate`
 followed by
 `npm run db-migrate`
 

@@ -66,19 +66,19 @@ router.get("/account/:address", async (req, res) => {
     getEulerGraphEndpoint(),
     query
   );
-  const loans: any[] = [];
-  const borrows: any[] = [];
+  const supply: any[] = [];
+  const borrow: any[] = [];
   account.balances.forEach(async (balance) => {
     const tokenData = await getEulerTokenDataByAddress(balance.asset.id);
     if (balance.amount[0] === "-") {
-      borrows.push({
+      borrow.push({
         token: tokenData,
         amount: new BigNumberJs(balance.amount.substring(1)).dividedBy(
           new BigNumberJs("10e17").toString()
         ),
       });
     } else {
-      loans.push({
+      supply.push({
         token: tokenData,
         amount: new BigNumberJs(balance.amount).dividedBy(
           new BigNumberJs("10e17").toString()
@@ -88,8 +88,8 @@ router.get("/account/:address", async (req, res) => {
   });
   const healthScore = await getHealthScoreByAddress(address);
   res.json({
-    loans,
-    borrows,
+    supply,
+    borrow,
     healthScore,
   });
 });

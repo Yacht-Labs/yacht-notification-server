@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from "ethers";
 import db from "../../prisma/db";
 import * as eulerLensContract from "../constants/abis/eulerLens.json";
-import { apnProvider } from "../notifications/apn";
+import { generateNotification, sendNotification } from "../notifications/apn";
 // // console.log("work");
 // // request(APIURL, tokenQuery).then(({ asset }) => {
 // //   console.log(asset);
@@ -47,28 +47,6 @@ import { apnProvider } from "../notifications/apn";
 //     }
 //   });
 // };
-
-const sendHealthNotifications = async () => {
-  const healthNotifications = await db.eulerHealthNotification.findMany({
-    where: { isActive: true },
-    include: {
-      account: {
-        select: {
-          address: true,
-          deviceId: true,
-        },
-      },
-    },
-  });
-  healthNotifications.forEach(async (notification) => {
-    const healthScore = await getHealthScoreByAddress(
-      notification.account.address
-    );
-    if (healthScore < notification.thresholdValue) {
-    }
-  });
-};
-
 const getHealthScoreByAddress = async (address: string): Promise<number> => {
   const provider = new ethers.providers.JsonRpcProvider(
     "https://mainnet.infura.io/v3/a1b56be8bd4d4b6fa5a343abffe797ab" // mainnet
@@ -81,4 +59,44 @@ const getHealthScoreByAddress = async (address: string): Promise<number> => {
   const { healthScore }: { healthScore: BigNumber } =
     await eulerLens.getAccountStatus(address);
   return parseInt(ethers.utils.formatEther(healthScore));
+};
+
+const sendHealthNotifications = async () => {
+  const healthNotifications = await db.eulerHealthNotification.findMany({
+    where: { isActive: true },
+    include: {
+      account: {
+        select: {
+          address: true,
+          deviceId: true,
+          name: true,
+        },
+      },
+    },
+  });
+  healthNotifications.forEach(async (notification) => {
+    const healthScore = await getHealthScoreByAddress(
+      notification.account.address
+    );
+    if (healthScore < notification.thresholdValue && !notification.seen) {
+      try {
+        const note = generateNotification(
+          `Euler healthscore for account ${notification.account.name} has dropped below ${notification.thresholdValue}!`
+        );
+        await sendNotification(note, notification.deviceId);
+        await db.eulerHealthNotification.update({
+          where: { id: notification.id },
+          data: { seen: true },
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (notification.seen && healthScore >= notification.thresholdValue * 1.1) {
+      await db.eulerHealthNotification.update({
+        where: { id: notification.id },
+        data: { seen: false },
+      });
+    }
+  });
 };
