@@ -60,6 +60,7 @@ const initTokenDb = async () => {
       };
       const eulerTokenData = {
         address: asset.id,
+        tokenId: asset.id,
         borrowAPY: formatAPY(asset.borrowAPY),
         supplyAPY: formatAPY(asset.supplyAPY),
         borrowFactor: new BigNumberJs(asset.config.borrowFactor)

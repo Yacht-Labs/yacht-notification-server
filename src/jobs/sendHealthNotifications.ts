@@ -2,51 +2,66 @@ import { BigNumber, ethers } from "ethers";
 import db from "../../prisma/db";
 import * as eulerLensContract from "../constants/abis/eulerLens.json";
 import { generateNotification, sendNotification } from "../notifications/apn";
-// // console.log("work");
-// // request(APIURL, tokenQuery).then(({ asset }) => {
-// //   console.log(asset);
-// //   const borrowAPY = asset.borrowAPY[0] + "." + asset.borrowAPY.slice(1, 3);
-// //   console.log(borrowAPY);
-// // });
 
-// const tokenQuery = gql`
-//   {
-//     asset(id: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2") {
-//       id
-//       name
-//       borrowAPY
-//       supplyAPY
-//     }
-//   }
-// `;
-// const prisma = new PrismaClient();
+const sendIRNotification = async () => {
+  const notifications = await db.eulerIRNotification.findMany({
+    where: { isActive: true },
+  });
+  notifications.forEach(async (notification) => {
+    try {
+      const eulerToken = await db.eulerToken.findFirstOrThrow({
+        where: { address: notification.tokenAddress },
+        include: {
+          token: {
+            select: {
+              symbol: true,
+            },
+          },
+        },
+      });
+      const { borrowAPY, supplyAPY } = eulerToken;
+      if (notification.borrowAPY && notification.borrowThreshold) {
+        const lowerBound =
+          notification.borrowAPY * (1 - notification.borrowThreshold);
+        const upperBound =
+          notification.borrowAPY * (1 + notification.borrowThreshold);
+        if (borrowAPY > upperBound || borrowAPY < lowerBound) {
+          const note = generateNotification(
+            `The Euler borrowAPY on ${eulerToken.token.symbol} is now ${borrowAPY}!`
+          );
+          await sendNotification(note, notification.deviceId);
+          await db.eulerIRNotification.update({
+            where: { id: notification.id },
+            data: {
+              borrowAPY,
+            },
+          });
+        }
+      }
+      if (notification.supplyAPY && notification.supplyThreshold) {
+        const lowerBound =
+          notification.supplyAPY * notification.supplyThreshold;
+        const upperBound =
+          notification.supplyAPY * (1 + notification.supplyThreshold);
+        if (supplyAPY > upperBound || supplyAPY < lowerBound) {
+          const note = generateNotification(
+            `The Euler supplyAPY on ${eulerToken.token.symbol} is now ${borrowAPY}`
+          );
+          await sendNotification(note, notification.deviceId);
+          await db.eulerIRNotification.update({
+            where: { id: notification.id },
+            data: {
+              supplyAPY,
+            },
+          });
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  });
+};
 
-// const sendIRNotification = async () => {
-//   const notifications = await prisma.eulerIRNotification.findMany({
-//     where: { isActive: true },
-//   });
-//   notifications.forEach(async (notification) => {
-//     try {
-//       const { borrowAPY, supplyAPY } = await prisma.token.findFirstOrThrow({
-//         where: { address: notification.tokenAddress },
-//       });
-//       if (notification.borrowAPY && notification.borrowThreshold) {
-//         const diff = Math.abs(borrowAPY - notification.borrowAPY);
-//         if (diff > notification.borrowThreshold / 100) {
-//           // construct notification
-//         }
-//       }
-//       if (notification.supplyAPY && notification.supplyThreshold) {
-//         const diff = Math.abs(borrowAPY - notification.supplyAPY);
-//         if (diff > notification.supplyThreshold / 100) {
-//           // construct notification
-//         }
-//       }
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   });
-// };
 const getHealthScoreByAddress = async (address: string): Promise<number> => {
   const provider = new ethers.providers.JsonRpcProvider(
     "https://mainnet.infura.io/v3/a1b56be8bd4d4b6fa5a343abffe797ab" // mainnet

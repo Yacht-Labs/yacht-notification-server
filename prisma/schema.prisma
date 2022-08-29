@@ -20,15 +20,18 @@ model Account {
 }
 
 model Token {
-  address  String @id
-  name     String
-  symbol   String
-  price    String
-  decimals Int
+  address    String       @id
+  name       String
+  symbol     String
+  price      String
+  decimals   Int
+  EulerToken EulerToken[]
 }
 
 model EulerToken {
   address             String                @id
+  token               Token                 @relation(fields: [tokenId], references: [address])
+  tokenId             String
   tier                String
   supplyAPY           Float
   borrowAPY           Float
