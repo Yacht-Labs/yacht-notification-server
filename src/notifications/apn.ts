@@ -24,6 +24,5 @@ note.expiry = Math.floor(Date.now() / 1000) + 3600;
 note.alert = "WAGMI";
 note.topic = "com.YachtLabs.Yacht";
 
-var apnProvider = new apn.Provider(options);
-
-apnProvider.send(note, deviceId).then((data) => process.exit());
+export const apnProvider = new apn.Provider(options);
+// apnProvider.send(note, deviceId).then((data) => process.exit());

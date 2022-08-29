@@ -49,7 +49,7 @@ interface EulerAccountBalance {
   }[];
 }
 
-router.get("/:address", async (req, res) => {
+router.get("/account/:address", async (req, res) => {
   const { address } = req.params;
   const query = `{
     account(id: "${address.toLowerCase()}") {
