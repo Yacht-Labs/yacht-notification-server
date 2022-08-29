@@ -9,18 +9,16 @@ Now execute the following code:
 You can confirm that the database was created by entering `\l`
 Exit the terminal with `quit()`
 
-Add the following environment variables to a .env file
+To set up the databse, run `npm run db-generate`
+followed by
+`npm run db-migrate`
 
-```
-DATABASE_URL="postgresql://user:password@localhost:5432/yacht_db?schema=public"
-EULER_GRAPH_ENDPOINT =
-  "https://api.thegraph.com/subgraphs/name/euler-xyz/euler-mainnet";
-```
-
-To generate the tables, enter `npx prisma migrate dev`
+If you have to run any migrations in the future, just run `npm run db-migrate NAME_OF_YOUR_MIGRATION`
 
 To initialize the token database, run `npm run db-init`
 
 You should now have token data in your db
+
+To view the database data within your web browser(Prisma Studio), run `npm run db-view`
 
 Copy .env.sample into a .env file. Ask for the vars that are blank

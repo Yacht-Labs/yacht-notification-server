@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = ""
+  url      = env("DATABASE_URL")
 }
 
 model Account {
@@ -20,50 +20,50 @@ model Account {
 }
 
 model Token {
-  address             String                @id
-  name                String
-  symbol              String
-  price               String
-  decimals            Int
-  EulerIRNotification EulerIRNotification[]
+  address  String @id
+  name     String
+  symbol   String
+  price    String
+  decimals Int
 }
 
 model EulerToken {
-  address          String   @id
-  tier             String
-  supplyAPY        Float
-  borrowAPY        Float
-  borrowFactor     Float
-  collateralFactor Float
-  eulAPY           Float
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  address             String                @id
+  tier                String
+  supplyAPY           Float
+  borrowAPY           Float
+  borrowFactor        Float
+  collateralFactor    Float
+  eulAPY              Float
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  EulerIRNotification EulerIRNotification[]
 }
 
 model EulerIRNotification {
-  id              String   @id @default(uuid())
-  account         Account  @relation(fields: [accountId], references: [id])
-  token           Token    @relation(fields: [tokenAddress], references: [address])
-  tokenAddress    String   @db.VarChar(255)
+  id              String     @id @default(uuid())
+  account         Account    @relation(fields: [accountId], references: [id])
+  token           EulerToken @relation(fields: [tokenAddress], references: [address])
+  tokenAddress    String     @db.VarChar(255)
   accountId       String
-  deviceId        String   @db.VarChar(255)
+  deviceId        String     @db.VarChar(255)
   borrowAPY       Float?
   supplyAPY       Float?
   borrowThreshold Int?
   supplyThreshold Int?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isActive        Boolean    @default(true)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 }
 
 model EulerHealthNotification {
-  id             String  @id @default(uuid())
-  account        Account @relation(fields: [accountId], references: [id])
+  id             String   @id @default(uuid())
+  account        Account  @relation(fields: [accountId], references: [id])
   thresholdValue Float
-  isActive       Boolean @default(true)
+  isActive       Boolean  @default(true)
   accountId      String
-  deviceId       String  @db.VarChar(255)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deviceId       String   @db.VarChar(255)
+  seen           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

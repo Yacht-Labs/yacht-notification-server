@@ -111,7 +111,7 @@ router.get("/tokens", async (req, res) => {
 
 router.get("/tokens/:address", async (req, res) => {
   const { address } = req.params;
-  res.json(getEulerTokenDataByAddress(address));
+  res.json(await getEulerTokenDataByAddress(address));
 });
 
 export default router;
