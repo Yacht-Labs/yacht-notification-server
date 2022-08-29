@@ -17,6 +17,19 @@ export const getApnAuthKey = (): string => {
   return getStringEnv("NOTIFICATION_AUTHKEY");
 };
 
+export const getEulerSimpleLens = (): string => {
+  return getStringEnv("EULER_SIMPLE_LENS");
+};
+
+export const getProviderUrl = (chainId: number): string => {
+  switch (chainId) {
+    case 1:
+      return getStringEnv("MAINNET_PROVIDER_URL");
+    default:
+      return getStringEnv("MAINNET_PROVIDER_URL");
+  }
+};
+
 export const getApnKeyId = (): string => {
   return getStringEnv("APN_KEY_ID");
 };
