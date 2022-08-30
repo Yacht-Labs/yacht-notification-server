@@ -3,6 +3,7 @@ import db from "../../prisma/db";
 import { request } from "graphql-request";
 import { getEulerGraphEndpoint, formatAPY } from "../utils/environment";
 import BigNumberJs from "bignumber.js";
+import logger from "../utils/logger";
 
 interface asset {
   id: string;
@@ -44,10 +45,7 @@ const initTokenDb = async () => {
     try {
       const { asset }: { asset: asset } = await request(
         getEulerGraphEndpoint(),
-        tokenQuery,
-        {
-          tokenAddress: collateralAsset.address,
-        }
+        tokenQuery
       );
       const tokenData = {
         address: asset.id,
@@ -72,18 +70,24 @@ const initTokenDb = async () => {
         tier: asset.config.tier,
         eulAPY: 0.0,
       };
-      await db.token.create({
-        data: {
-          ...tokenData,
-        },
-      });
-      await db.eulerToken.create({
-        data: {
-          ...eulerTokenData,
-        },
-      });
+      try {
+        await db.token.create({
+          data: {
+            ...tokenData,
+          },
+        });
+        await db.eulerToken.create({
+          data: {
+            ...eulerTokenData,
+          },
+        });
+      } catch (err) {
+        logger.error(`Database error: ${err}`);
+        process.exit(1);
+      }
     } catch (err) {
-      console.log(err);
+      logger.error(`Euler graph error: ${err}`);
+      process.exit(1);
     }
   });
 };

@@ -17,6 +17,10 @@ export const getApnAuthKey = (): string => {
   return getStringEnv("NOTIFICATION_AUTHKEY");
 };
 
+export const isProduction = (): boolean => {
+  return process.env.production === "true" ? true : false;
+};
+
 export const getEulerSimpleLens = (): string => {
   return getStringEnv("EULER_SIMPLE_LENS");
 };

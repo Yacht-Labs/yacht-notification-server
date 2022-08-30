@@ -2,10 +2,10 @@ import {
   getApnAuthKey,
   getApnKeyId,
   getApnTeamId,
+  isProduction,
 } from "./../utils/environment";
-import * as dotenv from "dotenv";
-dotenv.config();
 import apn from "apn";
+import logger from "../utils/logger";
 
 var options = {
   token: {
@@ -13,7 +13,7 @@ var options = {
     keyId: getApnKeyId(),
     teamId: getApnTeamId(),
   },
-  production: false,
+  production: isProduction(),
 };
 
 const deviceId =
@@ -21,6 +21,7 @@ const deviceId =
 // "ad3b33e47917d1e1dc388c53849922bb23a79ad93ef7c3ec4d8e7682604c73fe"; // henry
 
 const apnProvider = new apn.Provider(options);
+
 export const generateNotification = (message: string): apn.Notification => {
   const note = new apn.Notification();
   note.expiry = Math.floor(Date.now() / 1000) + 3600;
@@ -36,6 +37,6 @@ export const sendNotification = async (
   try {
     await apnProvider.send(note, deviceId);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
   }
 };
