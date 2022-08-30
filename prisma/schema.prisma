@@ -44,19 +44,21 @@ model EulerToken {
 }
 
 model EulerIRNotification {
-  id              String     @id @default(uuid())
-  account         Account    @relation(fields: [accountId], references: [id])
-  token           EulerToken @relation(fields: [tokenAddress], references: [address])
-  tokenAddress    String     @db.VarChar(255)
-  accountId       String
-  deviceId        String     @db.VarChar(255)
-  borrowAPY       Float?
-  supplyAPY       Float?
-  borrowThreshold Int?
-  supplyThreshold Int?
-  isActive        Boolean    @default(true)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id                   String     @id @default(uuid())
+  account              Account    @relation(fields: [accountId], references: [id])
+  token                EulerToken @relation(fields: [tokenAddress], references: [address])
+  tokenAddress         String     @db.VarChar(255)
+  accountId            String
+  deviceId             String     @db.VarChar(255)
+  borrowAPY            Float?
+  supplyAPY            Float?
+  borrowUpperThreshold Int?
+  borrowLowerThreshold Int?
+  supplyUpperThreshold Int?
+  supplyLowerThreshold Int?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model EulerHealthNotification {

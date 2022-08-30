@@ -10,8 +10,10 @@ router.post("euler/ir", async (req, res) => {
     tokenAddress,
     borrowAPY,
     supplyAPY,
-    supplyThreshold,
-    borrowThreshold,
+    supplyLowerThreshold,
+    supplyUpperThreshold,
+    borrowUpperThreshold,
+    borrowLowerThreshold,
   } = req.body;
   try {
     const irNotification = await db.eulerIRNotification.create({
@@ -21,8 +23,10 @@ router.post("euler/ir", async (req, res) => {
         tokenAddress,
         borrowAPY,
         supplyAPY,
-        supplyThreshold,
-        borrowThreshold,
+        supplyLowerThreshold,
+        supplyUpperThreshold,
+        borrowUpperThreshold,
+        borrowLowerThreshold,
       },
     });
     return res.json(irNotification);
@@ -50,7 +54,12 @@ router.get("euler/ir/:deviceId", async (req, res) => {
 
 router.put("/euler/ir/:id", async (req, res) => {
   const { id } = req.params;
-  const { borrowThreshold, supplyThreshold } = req.body;
+  const {
+    borrowUpperThreshold,
+    borrowLowerThreshold,
+    supplyUpperThreshold,
+    supplyLowerThreshold,
+  } = req.body;
   try {
     const notification = await db.eulerIRNotification.findUnique({
       where: { id },
@@ -58,12 +67,18 @@ router.put("/euler/ir/:id", async (req, res) => {
     const updatedNotification = await db.eulerIRNotification.update({
       where: { id },
       data: {
-        borrowThreshold: borrowThreshold
-          ? borrowThreshold
-          : notification?.borrowThreshold,
-        supplyThreshold: supplyThreshold
-          ? supplyThreshold
-          : notification?.supplyThreshold,
+        borrowUpperThreshold: borrowUpperThreshold
+          ? borrowUpperThreshold
+          : notification?.borrowUpperThreshold,
+        borrowLowerThreshold: borrowLowerThreshold
+          ? borrowLowerThreshold
+          : notification?.borrowLowerThreshold,
+        supplyUpperThreshold: supplyUpperThreshold
+          ? supplyUpperThreshold
+          : notification?.supplyUpperThreshold,
+        supplyLowerThreshold: supplyLowerThreshold
+          ? supplyLowerThreshold
+          : notification?.supplyLowerThreshold,
       },
     });
     return res.json(updatedNotification);

@@ -1,3 +1,4 @@
+import { DatabaseError } from "./../types/errors";
 import db from "../../prisma/db";
 import { generateNotification, sendNotification } from "../notifications/apn";
 import { getHealthScoreByAddress } from "../server/routes/Euler";
@@ -9,64 +10,69 @@ export const sendIRNotification = async () => {
       where: { isActive: true },
     });
     notifications.forEach(async (notification) => {
-      try {
-        const eulerToken = await db.eulerToken.findFirstOrThrow({
-          where: { address: notification.tokenAddress },
-          include: {
-            token: {
-              select: {
-                symbol: true,
-              },
+      const eulerToken = await db.eulerToken.findFirstOrThrow({
+        where: { address: notification.tokenAddress },
+        include: {
+          token: {
+            select: {
+              symbol: true,
             },
           },
-        });
-        const { borrowAPY, supplyAPY } = eulerToken;
-        if (notification.borrowAPY && notification.borrowThreshold) {
+        },
+      });
+      const { borrowAPY, supplyAPY } = eulerToken;
+      let notificationText: string = "";
+      if (notification.borrowAPY) {
+        if (notification.borrowLowerThreshold) {
           const lowerBound =
-            notification.borrowAPY * (1 - notification.borrowThreshold);
-          const upperBound =
-            notification.borrowAPY * (1 + notification.borrowThreshold);
-          if (borrowAPY > upperBound || borrowAPY < lowerBound) {
-            const note = generateNotification(
-              `The Euler borrowAPY on ${eulerToken.token.symbol} is now ${borrowAPY}!`
-            );
-            try {
-              await sendNotification(note, notification.deviceId);
-              await db.eulerIRNotification.update({
-                where: { id: notification.id },
-                data: {
-                  borrowAPY,
-                },
-              });
-            } catch (err) {
-              logger.error(`Error sending EulerIR notification: ${err}`);
-            }
+            notification.borrowAPY * (1 - notification.borrowLowerThreshold);
+          if (borrowAPY < lowerBound) {
+            notificationText = `The Euler borrowAPY on ${eulerToken.token.symbol} is now ${borrowAPY}!`;
           }
         }
-        if (notification.supplyAPY && notification.supplyThreshold) {
-          const lowerBound =
-            notification.supplyAPY * notification.supplyThreshold;
+        if (notification.borrowUpperThreshold) {
           const upperBound =
-            notification.supplyAPY * (1 + notification.supplyThreshold);
-          if (supplyAPY > upperBound || supplyAPY < lowerBound) {
-            const note = generateNotification(
-              `The Euler supplyAPY on ${eulerToken.token.symbol} is now ${borrowAPY}`
-            );
-            await sendNotification(note, notification.deviceId);
-            await db.eulerIRNotification.update({
-              where: { id: notification.id },
-              data: {
-                supplyAPY,
-              },
-            });
+            notification.borrowAPY * (1 + notification.borrowUpperThreshold);
+          if (borrowAPY > upperBound) {
+            notificationText = `The Euler borrowAPY on ${eulerToken.token.symbol} is now ${borrowAPY}!`;
           }
         }
-      } catch (err) {
-        logger.error(err);
+      }
+      if (notification.supplyAPY) {
+        if (notification.supplyLowerThreshold) {
+          const lowerBound =
+            notification.supplyAPY * (1 - notification.supplyLowerThreshold);
+          if (supplyAPY < lowerBound) {
+            notificationText = `The Euler supplyAPY on ${eulerToken.token.symbol} is now ${supplyAPY}!`;
+          }
+        }
+        if (notification.supplyUpperThreshold) {
+          const upperBound =
+            notification.supplyAPY * (1 + notification.supplyUpperThreshold);
+          if (supplyAPY > upperBound) {
+            notificationText = `The Euler supplyAPY on ${eulerToken.token.symbol} is now ${supplyAPY}!`;
+          }
+        }
+      }
+      if (notificationText) {
+        try {
+          await sendNotification(
+            generateNotification(notificationText),
+            notification.deviceId
+          );
+          await db.eulerIRNotification.update({
+            where: { id: notification.id },
+            data: {
+              borrowAPY,
+            },
+          });
+        } catch (err) {
+          logger.error(`Error sending EulerIR notification: ${err}`);
+        }
       }
     });
-  } catch (err) {
-    logger.error(err);
+  } catch (databaseError) {
+    logger.error(databaseError);
   }
 };
 
