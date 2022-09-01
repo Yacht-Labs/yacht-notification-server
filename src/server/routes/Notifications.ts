@@ -67,18 +67,10 @@ router.put("/euler/ir/:id", async (req, res) => {
     const updatedNotification = await db.eulerIRNotification.update({
       where: { id },
       data: {
-        borrowUpperThreshold: borrowUpperThreshold
-          ? borrowUpperThreshold
-          : notification?.borrowUpperThreshold,
-        borrowLowerThreshold: borrowLowerThreshold
-          ? borrowLowerThreshold
-          : notification?.borrowLowerThreshold,
-        supplyUpperThreshold: supplyUpperThreshold
-          ? supplyUpperThreshold
-          : notification?.supplyUpperThreshold,
-        supplyLowerThreshold: supplyLowerThreshold
-          ? supplyLowerThreshold
-          : notification?.supplyLowerThreshold,
+        borrowUpperThreshold,
+        borrowLowerThreshold,
+        supplyUpperThreshold,
+        supplyLowerThreshold,
       },
     });
     return res.json(updatedNotification);
