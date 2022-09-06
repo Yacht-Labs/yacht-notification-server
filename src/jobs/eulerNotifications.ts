@@ -7,7 +7,7 @@ import logger from "../utils/logger";
 export const sendIRNotification = async () => {
   try {
     const notifications = await db.eulerIRNotification.findMany({
-      where: { isActive: true },
+      where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
     });
     notifications.forEach(async (notification) => {
       const eulerToken = await db.eulerToken.findFirstOrThrow({
@@ -80,7 +80,7 @@ export const sendIRNotification = async () => {
 export const sendHealthNotifications = async () => {
   try {
     const healthNotifications = await db.eulerHealthNotification.findMany({
-      where: { isActive: true },
+      where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
       include: {
         account: {
           select: {
