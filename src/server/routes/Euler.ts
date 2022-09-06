@@ -135,23 +135,29 @@ router.get("/account/:address", async (req, res) => {
 
 router.get("/tokens", async (req, res) => {
   try {
-    const tokenData = await db.token.findMany();
-    const eulerTokenData = await db.eulerToken.findMany();
-    const combinedTokenData = tokenData.map((token) => {
-      const matchedToken = eulerTokenData.find(
-        (eulerToken) => eulerToken.address === token.address
-      );
-      return {
-        ...token,
-        ...matchedToken,
-      };
+    const eulerTokenData = await db.eulerToken.findMany({
+      include: {
+        token: {
+          select: {
+            name: true,
+            symbol: true,
+            price: true,
+            decimals: true,
+            logoURI: true,
+          },
+        },
+      },
     });
-    const sortedTokens = combinedTokenData.sort(
+    const formattedTokenInfo = eulerTokenData.map((eulerToken) => {
+      const { token, ...eulerData } = eulerToken;
+      return { ...token, ...eulerData };
+    });
+    const sortedTokens = formattedTokenInfo.sort(
       (a, b) =>
         parseFloat(b.totalSupplyUSD || "0") -
         parseFloat(a.totalSupplyUSD || "0")
     );
-    res.json(combinedTokenData);
+    res.json(sortedTokens);
   } catch (err) {
     logger.error(`Database error: ${err}`);
     res.sendStatus(500);
