@@ -83,6 +83,36 @@ router.delete("/:id", async (req, res) => {
         isActive: false,
       },
     });
+    const irNotifications = await db.eulerIRNotification.findMany({
+      where: {
+        accountId: account.id,
+      },
+    });
+    for (const notification of irNotifications) {
+      await db.eulerIRNotification.update({
+        where: {
+          id: notification.id,
+        },
+        data: {
+          isActive: false,
+        },
+      });
+    }
+    const healthNotifications = await db.eulerHealthNotification.findMany({
+      where: {
+        accountId: account.id,
+      },
+    });
+    for (const notification of healthNotifications) {
+      await db.eulerHealthNotification.update({
+        where: {
+          id: notification.id,
+        },
+        data: {
+          isActive: false,
+        },
+      });
+    }
     res.json(account);
   } catch (err) {
     logger.error(err);
