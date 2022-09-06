@@ -149,6 +149,7 @@ router.get("/tokens", async (req, res) => {
       },
     });
     const formattedTokenInfo = eulerTokenData.map((eulerToken) => {
+      // Flatten the object
       const { token, ...eulerData } = eulerToken;
       return { ...token, ...eulerData };
     });
