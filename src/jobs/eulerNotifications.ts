@@ -64,6 +64,7 @@ export const sendIRNotification = async () => {
             where: { id: notification.id },
             data: {
               borrowAPY,
+              supplyAPY,
             },
           });
         } catch (err) {

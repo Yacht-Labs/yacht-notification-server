@@ -43,7 +43,12 @@ const getEulerTokenDataByAddress = async (
 ): Promise<DatabaseResult<EulerToken & Token>> => {
   try {
     const tokenData = await db.token.findUnique({
-      where: { address },
+      where: {
+        address_chainId: {
+          address,
+          chainId: 1,
+        },
+      },
     });
     const eulerTokenData = await db.eulerToken.findUnique({
       where: { address },
@@ -141,6 +146,11 @@ router.get("/tokens", async (req, res) => {
         ...matchedToken,
       };
     });
+    const sortedTokens = combinedTokenData.sort(
+      (a, b) =>
+        parseFloat(b.totalSupplyUSD || "0") -
+        parseFloat(a.totalSupplyUSD || "0")
+    );
     res.json(combinedTokenData);
   } catch (err) {
     logger.error(`Database error: ${err}`);

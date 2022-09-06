@@ -51,9 +51,10 @@ describe("Euler Notifications", () => {
       // TEST CASES
       // 1.
       // Find a notification
-      // Get a healthScore that would trigger the threshold
+      // Get a APY that would trigger the threshold
       // Check that the notification was sent
       // Check that the notification was updated
+
       // 2.
       // Do the above for two notifications, both of which need notifications
       // 3.
@@ -61,5 +62,12 @@ describe("Euler Notifications", () => {
       // 4. Don't send for a notification that has been "seen"
       // 5. Reset
     });
+  });
+
+  describe("Interest Rate Notifications", () => {
+    // Find a healthscore that doesn't need a notification, don't do anything
+    // Find a healthscore that needs a notification, check that it was sent, check that the db updates to seen
+    // Find a healthscore that's been seen but should be updated to !seen
+    // Check error on unable to send notification
   });
 });

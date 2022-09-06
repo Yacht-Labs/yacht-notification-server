@@ -1,5 +1,0 @@
--- AlterTable
-ALTER TABLE "EulerIRNotification" ALTER COLUMN "borrowAPY" DROP NOT NULL,
-ALTER COLUMN "borrowThreshold" DROP NOT NULL,
-ALTER COLUMN "supplyAPY" DROP NOT NULL,
-ALTER COLUMN "supplyThreshold" DROP NOT NULL;

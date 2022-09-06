@@ -3,14 +3,13 @@ import { exec } from "child_process";
 
 const endpoint = getDbEndpoint();
 const [migrationName] = process.argv.slice(2);
-console.log(migrationName);
 
 const options = {
   env: { ...process.env, DATABASE_URL: endpoint },
 };
 
 exec(
-  `npx prisma migrate dev ${migrationName}`,
+  `npx prisma migrate reset --force ${migrationName}`,
   options,
   (error, stdout, stderr) => {
     if (error) {

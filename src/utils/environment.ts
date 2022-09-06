@@ -43,7 +43,7 @@ export const getApnTeamId = (): string => {
 };
 
 export const formatAPY = (rawAPY: string): number => {
-  return parseFloat(rawAPY[0] + "." + rawAPY.slice(1, 3));
+  return rawAPY === "0" ? 0 : parseFloat(rawAPY[0] + "." + rawAPY.slice(1, 3));
 };
 
 export const getDbUser = (): string => {

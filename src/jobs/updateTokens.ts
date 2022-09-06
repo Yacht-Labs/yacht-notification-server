@@ -1,61 +1,38 @@
-import { formatAPY, getEulerGraphEndpoint } from "./../utils/environment";
-import request, { gql } from "graphql-request";
-import { collateralAssets } from "../constants/tokenAddresses";
+import { TokenInfo } from "./../types/Euler";
 import db from "../../prisma/db";
-import BigNumberJs from "bignumber.js";
 import logger from "../utils/logger";
+import fetch from "node-fetch";
 
-export const updateAPYs = async () => {
-  console.log("...Updating token data....");
-  collateralAssets.forEach(async (collateralAsset) => {
-    const tokenQuery = `
-    {
-      asset(id: "${collateralAsset.address}") {
-        id
-        borrowAPY
-        supplyAPY
-        currPriceUsd
-      }
-    }
-  `;
-    try {
-      const {
-        asset,
-      }: {
-        asset: {
-          id: string;
-          borrowAPY: string;
-          supplyAPY: string;
-          currPriceUsd: string;
-        };
-      } = await request(getEulerGraphEndpoint(), tokenQuery, {
-        tokenAddress: collateralAsset.address,
+export const updateTokenList = async () => {
+  try {
+    const response = await fetch(
+      "https://raw.githubusercontent.com/euler-xyz/euler-tokenlist/master/euler-tokenlist.json"
+    );
+    const { tokens } = await response.json();
+    tokens.forEach(async (token: TokenInfo) => {
+      const tokenDbEntry = await db.token.findFirst({
+        where: {
+          address: token.address,
+          chainId: token.chainId,
+        },
       });
-      const borrowAPY = formatAPY(asset.borrowAPY);
-      const supplyAPY = formatAPY(asset.supplyAPY);
-      const price = new BigNumberJs(asset.currPriceUsd)
-        .dividedBy(new BigNumberJs("10e17"))
-        .toString();
-      try {
-        await db.eulerToken.update({
-          where: { address: collateralAsset.address },
+      if (!tokenDbEntry) {
+        await db.token.create({
           data: {
-            borrowAPY,
-            supplyAPY,
+            address: token.address,
+            chainId: token.chainId,
+            logoURI: token.logoURI,
+            name: token.name,
+            symbol: token.symbol,
+            decimals: token.decimals,
+            extensions: token.extensions,
           },
         });
-        await db.token.update({
-          where: { address: collateralAsset.address },
-          data: {
-            price,
-          },
-        });
-      } catch (err) {
-        logger.error(`Database error: ${err}`);
       }
-    } catch (err) {
-      logger.error(`Euler graph error: ${err}`);
-    }
-  });
-  console.log("...Finished updating token data....");
+    });
+  } catch (err) {
+    logger.error(err);
+  }
 };
+
+updateTokenList();

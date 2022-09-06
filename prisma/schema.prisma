@@ -20,23 +20,31 @@ model Account {
 }
 
 model Token {
-  address    String       @id
+  id         String       @id @default(uuid())
+  address    String
+  chainId    Int
   name       String
   symbol     String
-  price      String
+  price      String?
   decimals   Int
+  logoURI    String?
+  extensions Json?
   EulerToken EulerToken[]
+
+  @@unique([address, chainId])
 }
 
 model EulerToken {
-  address             String                @id
-  token               Token                 @relation(fields: [tokenId], references: [address])
+  id                  String                @id @default(uuid())
+  address             String                @unique
+  token               Token                 @relation(fields: [tokenId], references: [id])
   tokenId             String
   tier                String
   supplyAPY           Float
   borrowAPY           Float
   borrowFactor        Float
   collateralFactor    Float
+  totalSupplyUSD      String
   eulAPY              Float
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
@@ -46,7 +54,7 @@ model EulerToken {
 model EulerIRNotification {
   id                   String     @id @default(uuid())
   account              Account    @relation(fields: [accountId], references: [id])
-  token                EulerToken @relation(fields: [tokenAddress], references: [address])
+  tokenId              EulerToken @relation(fields: [tokenAddress], references: [id])
   tokenAddress         String     @db.VarChar(255)
   accountId            String
   deviceId             String     @db.VarChar(255)
@@ -56,9 +64,9 @@ model EulerIRNotification {
   borrowLowerThreshold Int?
   supplyUpperThreshold Int?
   supplyLowerThreshold Int?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive             Boolean    @default(true)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
 }
 
 model EulerHealthNotification {
