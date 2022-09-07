@@ -64,6 +64,7 @@ model EulerIRNotification {
   borrowLowerThreshold Int?
   supplyUpperThreshold Int?
   supplyLowerThreshold Int?
+  subAccountId         String
   isActive             Boolean    @default(true)
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
@@ -75,6 +76,7 @@ model EulerHealthNotification {
   thresholdValue Float
   isActive       Boolean  @default(true)
   accountId      String
+  subAccountId   String
   deviceId       String   @db.VarChar(255)
   seen           Boolean  @default(false)
   createdAt      DateTime @default(now())

@@ -14,6 +14,7 @@ router.post("euler/ir", async (req, res) => {
     supplyUpperThreshold,
     borrowUpperThreshold,
     borrowLowerThreshold,
+    subAccountId,
   } = req.body;
   try {
     const irNotification = await db.eulerIRNotification.create({
@@ -27,6 +28,7 @@ router.post("euler/ir", async (req, res) => {
         supplyUpperThreshold,
         borrowUpperThreshold,
         borrowLowerThreshold,
+        subAccountId,
       },
     });
     return res.json(irNotification);
@@ -95,13 +97,14 @@ router.delete("/euler/ir/:id", async (req, res) => {
 });
 
 router.post("/euler/health", async (req, res) => {
-  const { accountId, thresholdValue, deviceId } = req.body;
+  const { accountId, thresholdValue, deviceId, subAccountId } = req.body;
   try {
     const healthNotification = await db.eulerHealthNotification.create({
       data: {
         accountId,
         deviceId,
         thresholdValue,
+        subAccountId,
       },
     });
     return res.json(healthNotification);
