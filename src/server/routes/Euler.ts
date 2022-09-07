@@ -131,7 +131,7 @@ router.get("/account/:address", async (req, res) => {
       subAccountId: string;
       supplies: { token: EulerToken & Token; amount: string }[];
       borrows: { token: EulerToken & Token; amount: string }[];
-      healthScore: number;
+      healthScore: ProviderResult<number>;
     }[] = [];
     for (const account of accounts) {
       const supplies: { token: EulerToken & Token; amount: string }[] = [];
@@ -158,12 +158,10 @@ router.get("/account/:address", async (req, res) => {
         }
       });
       console.log("Account ID: ", account.id);
-      let healthScore: ProviderResult<number> = await getHealthScoreByAddress(
-        account.id
-      );
+      const healthScore = await getHealthScoreByAddress(account.id);
       if (healthScore instanceof ProviderError) {
         logger.error(healthScore.message);
-        healthScore = 0;
+        res.sendStatus(500);
       }
       accountInfo.push({
         subAccountId: account.id,
