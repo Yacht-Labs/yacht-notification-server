@@ -9,7 +9,11 @@ import { request } from "graphql-request";
 import { BigNumber, ethers } from "ethers";
 import * as eulerLensContract from "../../constants/abis/eulerLens.json";
 import BigNumberJs from "bignumber.js";
-import { DatabaseResult, ProviderResult } from "../../types/results";
+import {
+  DatabaseResult,
+  GraphResult,
+  ProviderResult,
+} from "../../types/results";
 import { DatabaseError, GraphError, ProviderError } from "../../types/errors";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import logger from "../../utils/logger";
@@ -65,68 +69,110 @@ const getEulerTokenDataByAddress = async (
   }
 };
 
-interface EulerAccountBalance {
-  balances: {
-    amount: string;
-    asset: {
-      id: string;
-      name: string;
-    };
-  }[];
-}
-
-router.get("/account/:address", async (req, res) => {
-  const { address }: { address: string } = req.params;
+const getEulerTopLevelAccountId = async (
+  subAccount: string
+): Promise<GraphResult<string>> => {
   const query = `{
-    account(id: "${address.toLowerCase()}") {
-      balances {
-        amount
-        asset {
-          id
-          name
-        }
+    account(id: "${subAccount.toLowerCase()}") {
+      topLevelAccount{
+        id
       }
     }
   }`;
   try {
-    const { account }: { account: EulerAccountBalance } = await request(
-      getEulerGraphEndpoint(),
-      query
-    );
-    const supplies: { token: EulerToken & Token; amount: string }[] = [];
-    const borrows: { token: EulerToken & Token; amount: string }[] = [];
-    account.balances.forEach(async (balance) => {
-      const tokenData = await getEulerTokenDataByAddress(balance.asset.id);
-      if (tokenData instanceof DatabaseError) {
-        return res.sendStatus(500);
+    const {
+      account: {
+        topLevelAccount: { id },
+      },
+    } = await request(getEulerGraphEndpoint(), query);
+    return id;
+  } catch (err) {
+    return new GraphError(getErrorMessage(err));
+  }
+};
+
+interface EulerAccountBalance {
+  amount: string;
+  asset: {
+    id: string;
+  };
+}
+
+interface EulerTopLevelAccount {
+  topLevelAccount: {
+    accounts: { id: string; balances: EulerAccountBalance[] }[];
+  };
+}
+
+router.get("/account/:address", async (req, res) => {
+  const { address }: { address: string } = req.params;
+  const topLevelAccountId = await getEulerTopLevelAccountId(address);
+  if (topLevelAccountId instanceof GraphError) {
+    return res.sendStatus(500);
+  }
+  const query = `{
+    topLevelAccount(id: "${topLevelAccountId.toLowerCase()}") {
+        accounts {
+          id
+          balances {
+            amount
+            asset {
+              id
+            }
+          }
       }
-      if (balance.amount[0] === "-") {
-        borrows.push({
-          token: tokenData,
-          amount: new BigNumberJs(balance.amount.substring(1))
-            .dividedBy(new BigNumberJs("10e17"))
-            .toString(),
-        });
-      } else {
-        supplies.push({
-          token: tokenData,
-          amount: new BigNumberJs(balance.amount)
-            .dividedBy(new BigNumberJs("10e17"))
-            .toString(),
-        });
-      }
-    });
-    const healthScore: ProviderResult<number> = await getHealthScoreByAddress(
-      address
-    );
-    if (healthScore instanceof ProviderError) {
-      return res.sendStatus(500);
     }
-    return res.json({
-      supplies,
-      borrows,
-      healthScore,
-    });
+  }`;
+  try {
+    const {
+      topLevelAccount: { accounts },
+    }: EulerTopLevelAccount = await request(getEulerGraphEndpoint(), query);
+    const accountInfo: {
+      subAccountId: string;
+      supplies: { token: EulerToken & Token; amount: string }[];
+      borrows: { token: EulerToken & Token; amount: string }[];
+      healthScore: number;
+    }[] = [];
+    for (const account of accounts) {
+      const supplies: { token: EulerToken & Token; amount: string }[] = [];
+      const borrows: { token: EulerToken & Token; amount: string }[] = [];
+      account.balances.forEach(async (balance) => {
+        const tokenData = await getEulerTokenDataByAddress(balance.asset.id);
+        if (tokenData instanceof DatabaseError) {
+          return res.sendStatus(500);
+        }
+        if (balance.amount[0] === "-") {
+          borrows.push({
+            token: tokenData,
+            amount: new BigNumberJs(balance.amount.substring(1))
+              .dividedBy(new BigNumberJs("10e17"))
+              .toString(),
+          });
+        } else {
+          supplies.push({
+            token: tokenData,
+            amount: new BigNumberJs(balance.amount)
+              .dividedBy(new BigNumberJs("10e17"))
+              .toString(),
+          });
+        }
+      });
+      console.log("Account ID: ", account.id);
+      let healthScore: ProviderResult<number> = await getHealthScoreByAddress(
+        account.id
+      );
+      if (healthScore instanceof ProviderError) {
+        logger.error(healthScore.message);
+        healthScore = 0;
+      }
+      accountInfo.push({
+        subAccountId: account.id,
+        supplies,
+        borrows,
+        healthScore,
+      });
+    }
+    return res.json(accountInfo);
   } catch (err) {
     const graphError = new GraphError(getErrorMessage(err));
     return res.sendStatus(500);
