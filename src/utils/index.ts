@@ -7,3 +7,12 @@ export function getSubAccount(primary: string, subAccountId: number) {
     20
   );
 }
+
+export function getSubAccountIdFromAccount(
+  primary: string,
+  subAccount: string
+) {
+  return Number(
+    utils.hexZeroPad(BigNumber.from(primary).xor(subAccount).toHexString(), 20)
+  );
+}

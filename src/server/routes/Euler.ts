@@ -18,6 +18,7 @@ import { DatabaseError, GraphError, ProviderError } from "../../types/errors";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import logger from "../../utils/logger";
 import { EulerToken, Token } from "@prisma/client";
+import { getSubAccountIdFromAccount } from "../../utils";
 
 const router = express.Router();
 
@@ -128,7 +129,7 @@ router.get("/account/:address", async (req, res) => {
       topLevelAccount: { accounts },
     }: EulerTopLevelAccount = await request(getEulerGraphEndpoint(), query);
     const accountInfo: {
-      subAccountId: string;
+      subAccountId: number;
       supplies: { token: EulerToken & Token; amount: string }[];
       borrows: { token: EulerToken & Token; amount: string }[];
       healthScore: ProviderResult<number>;
@@ -164,7 +165,7 @@ router.get("/account/:address", async (req, res) => {
         res.sendStatus(500);
       }
       accountInfo.push({
-        subAccountId: account.id,
+        subAccountId: getSubAccountIdFromAccount(topLevelAccountId, account.id),
         supplies,
         borrows,
         healthScore,
