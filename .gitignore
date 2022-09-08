@@ -1,5 +1,5 @@
 jsRunner.ts
-
+.elasticbeanstalk/
 # Logs
 logs
 *.log
@@ -104,3 +104,8 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
