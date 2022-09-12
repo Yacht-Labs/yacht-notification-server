@@ -15,6 +15,7 @@
     "db-deploy": "ts-node prisma/scripts/deployScript.ts",
     "db-view": "ts-node prisma/scripts/studioScript.ts",
     "db-reset": "ts-node prisma/scripts/resetScript.ts",
+    "db-seed": "ts-node prisma/scripts/seedScript.ts",
     "dev": "nodemon src/server/index.ts"
   },
   "author": "Yacht Labs Inc.",

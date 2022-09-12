@@ -1,5 +1,5 @@
-import { formatAPY, getEulerGraphEndpoint } from "./../../utils/environment";
-import { ProviderError } from "./../../types/errors";
+import { formatAPY, getEulerGraphEndpoint } from "../../utils/environment";
+import { ProviderError } from "../../types/errors";
 import { ProviderResult } from "../../types/results";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import { request } from "graphql-request";
@@ -40,7 +40,7 @@ interface Patch {
   }[];
 }
 
-const getEulAPYRaw = async () =>
+export const updateEulApy = async () =>
   // : Promise<
   //   ProviderResult<{
   //     epoch: {
@@ -137,5 +137,3 @@ const getEulAPYRaw = async () =>
       }
     );
   };
-
-getEulAPYRaw();

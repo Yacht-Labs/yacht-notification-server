@@ -52,7 +52,7 @@ model EulerToken {
 
 model EulerIRNotification {
   id                   String     @id @default(uuid())
-  token                EulerToken @relation(fields: [tokenAddress], references: [id])
+  token                EulerToken @relation(fields: [tokenAddress], references: [address])
   tokenAddress         String     @db.VarChar(255)
   deviceId             String     @db.VarChar(255)
   borrowAPY            Float?

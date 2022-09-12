@@ -1,4 +1,3 @@
-import { collateralAssets } from "../constants/tokenAddresses";
 import db from "../../prisma/db";
 import { gql, request } from "graphql-request";
 import { getEulerGraphEndpoint, formatAPY } from "../utils/environment";
@@ -21,7 +20,7 @@ interface asset {
   };
 }
 
-const updateEulerTokens = async () => {
+export const updateEulerTokens = async () => {
   const tokenQuery = gql`
     query {
       assets {
@@ -113,5 +112,3 @@ const updateEulerTokens = async () => {
     process.exit(1);
   }
 };
-
-updateEulerTokens();
