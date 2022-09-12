@@ -134,6 +134,7 @@ export const updateEulApy = async () =>
           });
         }
         console.log("---Finished updating EUL APYS---");
+        process.exit(0);
       }
     );
   };
