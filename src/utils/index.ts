@@ -12,6 +12,8 @@ export function getSubAccountIdFromAccount(
   primary: string,
   subAccount: string
 ) {
+  // console.log({ primary });
+  // console.log({ subAccount });
   return Number(
     utils.hexZeroPad(BigNumber.from(primary).xor(subAccount).toHexString(), 20)
   );
