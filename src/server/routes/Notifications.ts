@@ -29,11 +29,7 @@ router.post("/euler/ir", async (req, res) => {
         borrowLowerThreshold,
       },
       include: {
-        token: {
-          select: {
-            address: true,
-          },
-        },
+        token: true,
       },
     });
     console.log({ irNotification });
