@@ -28,7 +28,15 @@ router.post("/euler/ir", async (req, res) => {
         borrowUpperThreshold,
         borrowLowerThreshold,
       },
+      include: {
+        token: {
+          select: {
+            address: true,
+          },
+        },
+      },
     });
+    console.log({ irNotification });
     return res.json(irNotification);
   } catch (err) {
     logger.error(`Database error: ${err}`);
@@ -61,9 +69,6 @@ router.put("/euler/ir/:id", async (req, res) => {
     supplyLowerThreshold,
   } = req.body;
   try {
-    const notification = await db.eulerIRNotification.findUnique({
-      where: { id },
-    });
     const updatedNotification = await db.eulerIRNotification.update({
       where: { id },
       data: {
@@ -142,6 +147,7 @@ router.put("/euler/health/:id", async (req, res) => {
       },
       data: {
         thresholdValue,
+        seen: false,
       },
     });
     return res.json(healthNotification);
