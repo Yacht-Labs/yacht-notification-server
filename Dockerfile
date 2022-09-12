@@ -5,4 +5,4 @@ RUN npm install
 COPY . .
 EXPOSE 3000
 RUN npx prisma generate
-CMD ["npm", "run", "db-init", "&&", "npx", "ts-node", "src/server/index.ts"]
+CMD ["npm", "start"]

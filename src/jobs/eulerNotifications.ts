@@ -106,7 +106,7 @@ export const sendHealthNotifications = async () => {
             data: { seen: true },
           });
         } catch (err) {
-          console.log(`Error sending Euler health notification: ${err}`);
+          logger.error(`Error sending Euler health notification: ${err}`);
         }
       }
       if (

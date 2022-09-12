@@ -158,7 +158,6 @@ router.get("/account/:address", async (req, res) => {
           });
         }
       });
-      console.log("Account ID: ", account.id);
       const healthScore = await getHealthScoreByAddress(account.id);
       if (healthScore instanceof ProviderError) {
         logger.error(healthScore.message);

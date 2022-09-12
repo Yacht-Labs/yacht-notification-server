@@ -3,12 +3,6 @@ import db from "../../../prisma/db";
 import logger from "../../utils/logger";
 const router = express.Router();
 
-interface Account {
-  address: string;
-  deviceId: string;
-  name?: string;
-}
-
 router.get("/:deviceId", async (req, res) => {
   const { deviceId } = req.params;
   try {
@@ -85,7 +79,7 @@ router.delete("/:id", async (req, res) => {
     });
     const irNotifications = await db.eulerIRNotification.findMany({
       where: {
-        accountId: account.id,
+        deviceId: account.deviceId,
       },
     });
     for (const notification of irNotifications) {

@@ -3,9 +3,8 @@ import db from "../../../prisma/db";
 import logger from "../../utils/logger";
 const router = express.Router();
 
-router.post("euler/ir", async (req, res) => {
+router.post("/euler/ir", async (req, res) => {
   const {
-    accountId,
     deviceId,
     tokenAddress,
     borrowAPY,
@@ -14,21 +13,20 @@ router.post("euler/ir", async (req, res) => {
     supplyUpperThreshold,
     borrowUpperThreshold,
     borrowLowerThreshold,
-    subAccountId,
   } = req.body;
   try {
     const irNotification = await db.eulerIRNotification.create({
       data: {
-        accountId,
         deviceId,
-        tokenAddress,
+        token: {
+          connect: { address: tokenAddress },
+        },
         borrowAPY,
         supplyAPY,
         supplyLowerThreshold,
         supplyUpperThreshold,
         borrowUpperThreshold,
         borrowLowerThreshold,
-        subAccountId,
       },
     });
     return res.json(irNotification);
@@ -38,7 +36,7 @@ router.post("euler/ir", async (req, res) => {
   }
 });
 
-router.get("euler/ir/:deviceId", async (req, res) => {
+router.get("/euler/ir/:deviceId", async (req, res) => {
   const { deviceId } = req.params;
   try {
     const irNotifications = await db.eulerIRNotification.findMany({
@@ -101,7 +99,11 @@ router.post("/euler/health", async (req, res) => {
   try {
     const healthNotification = await db.eulerHealthNotification.create({
       data: {
-        accountId,
+        account: {
+          connect: {
+            id: accountId,
+          },
+        },
         deviceId,
         thresholdValue,
         subAccountId,
