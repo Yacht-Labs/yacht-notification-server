@@ -13,6 +13,7 @@ interface asset {
   borrowAPY: string;
   supplyAPY: string;
   totalBalances: string;
+  totalBorrows: string;
   config: {
     borrowFactor: string;
     collateralFactor: string;
@@ -30,6 +31,7 @@ export const updateEulerTokens = async () => {
         decimals
         supplyAPY
         totalBalances
+        totalBorrows
         config {
           borrowFactor
           collateralFactor
@@ -49,6 +51,12 @@ export const updateEulerTokens = async () => {
         .toString();
       const eulerTokenData = {
         totalSupplyUSD: new BigNumberJs(asset.totalBalances)
+          .dividedBy(
+            new BigNumberJs(`10e${(parseInt(asset.decimals) - 1).toString()}`)
+          )
+          .multipliedBy(new BigNumberJs(price))
+          .toFixed(),
+        totalBorrowsUSD: new BigNumberJs(asset.totalBorrows)
           .dividedBy(
             new BigNumberJs(`10e${(parseInt(asset.decimals) - 1).toString()}`)
           )

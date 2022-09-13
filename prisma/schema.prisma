@@ -44,6 +44,7 @@ model EulerToken {
   borrowFactor        Float
   collateralFactor    Float
   totalSupplyUSD      String
+  totalBorrowsUSD     String
   eulAPY              Float
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
