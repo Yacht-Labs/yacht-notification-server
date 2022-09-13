@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "jest -i",
-    "start": "tsc && node ./dist/src/server/index.js",
+    "start": "npm run db-deploy && npm run db-seed && tsc && node ./dist/src/server/index.js",
     "db-init": "ts-node src/scripts/initTokenDb.ts",
     "db-migrate": "ts-node prisma/scripts/migrateScript.ts",
     "db-generate": "ts-node prisma/scripts/generateScript.ts",
