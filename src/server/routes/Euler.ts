@@ -126,7 +126,6 @@ const getEulerAccountBalances = async (
     if (getSubAccountIdFromAccount(topLevelAccountId, account.id) > 256) {
       continue;
     }
-    console.log("processing");
     const supplies: { token: EulerToken & Token; amount: string }[] = [];
     const borrows: { token: EulerToken & Token; amount: string }[] = [];
     account.balances.forEach(async (balance) => {
