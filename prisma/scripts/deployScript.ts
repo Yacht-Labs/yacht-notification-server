@@ -8,8 +8,6 @@ const options = {
   env: { ...process.env, DATABASE_URL: endpoint },
 };
 
-console.log("ENV VARS: \n", process.env);
-
 exec(
   `npx prisma migrate deploy ${migrationName}`,
   options,
