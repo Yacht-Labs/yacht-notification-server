@@ -2,29 +2,28 @@ import {
   getEulerGraphEndpoint,
   getEulerSimpleLens,
   getProviderUrl,
-} from "./../../utils/environment";
+} from "../../../utils/environment";
 import express from "express";
-import db from "../../../prisma/db";
+import db from "../../../../prisma/db";
 import { request } from "graphql-request";
 import { BigNumber, ethers } from "ethers";
-import * as eulerLensContract from "../../constants/abis/eulerLens.json";
+import * as eulerLensContract from "../../../constants/abis/eulerLens.json";
 import BigNumberJs from "bignumber.js";
 import {
   DatabaseResult,
   GraphResult,
   ProviderResult,
-} from "../../types/results";
+} from "../../../types/results";
 import {
   DatabaseError,
   GraphError,
   ProviderError,
   YachtError,
-} from "../../types/errors";
-import { getErrorMessage } from "../../utils/getErrorMessage";
-import logger from "../../utils/logger";
+} from "../../../types/errors";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
+import logger from "../../../utils/logger";
 import { EulerToken, Token } from "@prisma/client";
-import { getSubAccountIdFromAccount } from "../../utils";
-import { token } from "apn";
+import { getSubAccountIdFromAccount } from "../../../utils";
 
 const router = express.Router();
 
@@ -80,12 +79,12 @@ const getEulerTopLevelAccountId = async (
   subAccount: string
 ): Promise<GraphResult<string>> => {
   const query = `{
-    account(id: "${subAccount.toLowerCase()}") {
-      topLevelAccount{
-        id
+      account(id: "${subAccount.toLowerCase()}") {
+        topLevelAccount{
+          id
+        }
       }
-    }
-  }`;
+    }`;
   try {
     const {
       account: {
@@ -172,19 +171,19 @@ router.get("/account/:address", async (req, res) => {
     return res.sendStatus(500);
   }
   const query = `{
-    topLevelAccount(id: "${topLevelAccountId.toLowerCase()}") {
-        id
-        accounts {
+      topLevelAccount(id: "${topLevelAccountId.toLowerCase()}") {
           id
-          balances {
-            amount
-            asset {
-              id
+          accounts {
+            id
+            balances {
+              amount
+              asset {
+                id
+              }
             }
-          }
+        }
       }
-    }
-  }`;
+    }`;
   try {
     const {
       topLevelAccount: { id: topLevelAccountId, accounts },
@@ -213,47 +212,6 @@ router.get("/account/:address", async (req, res) => {
     const graphError = new GraphError(getErrorMessage(err));
     return res.sendStatus(500);
   }
-});
-
-router.get("/tokens", async (req, res) => {
-  try {
-    const eulerTokenData = await db.eulerToken.findMany({
-      include: {
-        token: {
-          select: {
-            name: true,
-            symbol: true,
-            price: true,
-            decimals: true,
-            logoURI: true,
-          },
-        },
-      },
-    });
-    const formattedTokenInfo = eulerTokenData.map((eulerToken) => {
-      // Flatten the object
-      const { token, ...eulerData } = eulerToken;
-      return { ...token, ...eulerData };
-    });
-    const sortedTokens = formattedTokenInfo.sort(
-      (a, b) =>
-        parseFloat(b.totalSupplyUSD || "0") -
-        parseFloat(a.totalSupplyUSD || "0")
-    );
-    res.json(sortedTokens);
-  } catch (err) {
-    logger.error(`Database error: ${err}`);
-    res.sendStatus(500);
-  }
-});
-
-router.get("/tokens/:address", async (req, res) => {
-  const { address } = req.params;
-  const eulerTokenData = await getEulerTokenDataByAddress(address);
-  if (eulerTokenData instanceof DatabaseError) {
-    return res.sendStatus(500);
-  }
-  return res.json(eulerTokenData);
 });
 
 export default router;

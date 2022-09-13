@@ -124,7 +124,7 @@ export const updateEulApy = async () =>
               parseFloat(eulPrice)) /
               parseFloat(formattedBorrows)) *
             100;
-          const updatedToken = await db.eulerToken.update({
+          await db.eulerToken.update({
             where: {
               address: token.tokenAddress,
             },
@@ -134,7 +134,9 @@ export const updateEulApy = async () =>
           });
         }
         console.log("---Finished updating EUL APYS---");
-        process.exit(0);
+        await eulerClient.shutdown();
+        process.exit;
+        return;
       }
     );
   };

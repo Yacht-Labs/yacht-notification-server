@@ -1,7 +1,7 @@
 import express from "express";
-import eulerRoutes from "./routes/Euler";
-import accountRoutes from "./routes/Accounts";
-import notificationRoutes from "./routes/Notifications";
+import eulerRoutes from "./routes/euler/";
+import accountRoutes from "./routes/accounts";
+import notificationRoutes from "./routes/notifications/";
 import { runJobs } from "../jobs";
 const app = express();
 const port = 3000;

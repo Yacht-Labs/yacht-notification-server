@@ -8,8 +8,8 @@ export const updateTokenList = async () => {
     const response = await fetch(
       "https://raw.githubusercontent.com/euler-xyz/euler-tokenlist/master/euler-tokenlist.json"
     );
-    const { tokens } = await response.json();
-    tokens.forEach(async (token: TokenInfo) => {
+    const { tokens }: { tokens: TokenInfo[] } = await response.json();
+    for (const token of tokens) {
       const tokenDbEntry = await db.token.findFirst({
         where: {
           address: token.address,
@@ -33,7 +33,7 @@ export const updateTokenList = async () => {
           logger.error(err);
         }
       }
-    });
+    }
   } catch (err) {
     logger.error(err);
   }

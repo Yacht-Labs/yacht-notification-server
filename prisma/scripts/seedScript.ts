@@ -1,6 +1,6 @@
-import { updateEulApy } from "./../../src/jobs/EulerTools/eulerAPYScript";
+import { updateEulApy } from "../../src/jobs/eulerTokens/eulerAPYScript";
 import { updateTokenList } from "../../src/jobs/updateTokens";
-import { updateEulerTokens } from "../../src/jobs/updateEulerTokens";
+import { updateEulerTokens } from "../../src/jobs/eulerTokens/updateEulerTokens";
 
 async function seedDb() {
   await updateTokenList();
