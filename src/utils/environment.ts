@@ -18,7 +18,7 @@ export const getApnAuthKey = (): string => {
 };
 
 export const isProduction = (): boolean => {
-  return process.env.production === "true" ? true : false;
+  return process.env.PRODUCTION === "true" ? true : false;
 };
 
 export const getEulerSimpleLens = (): string => {
@@ -60,23 +60,29 @@ export const formatAPY = (rawAPY: string): number => {
 };
 
 export const getDbUser = (): string => {
-  return getStringEnv("DB_USER");
+  return isProduction()
+    ? getStringEnv("RDS_USERNAME")
+    : getStringEnv("DB_USER");
 };
 
 export const getDbPassword = (): string => {
-  return getStringEnv("DB_PASSWORD");
+  return isProduction()
+    ? getStringEnv("RDS_PASSWORD")
+    : getStringEnv("DB_PASSWORD");
 };
 
 export const getDbHost = (): string => {
-  return getStringEnv("DB_HOST");
+  return isProduction()
+    ? getStringEnv("RDS_HOSTNAME")
+    : getStringEnv("DB_HOST");
 };
 
 export const getDbPort = (): string => {
-  return getStringEnv("DB_PORT");
+  return isProduction() ? getStringEnv("RDS_PORT") : getStringEnv("DB_PORT");
 };
 
 export const getDbName = (): string => {
-  return getStringEnv("DB_NAME");
+  return isProduction() ? getStringEnv("RDS_DB_NAME") : getStringEnv("DB_NAME");
 };
 
 export const getDbEndpoint = (): string => {
