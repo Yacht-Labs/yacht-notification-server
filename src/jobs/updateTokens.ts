@@ -17,17 +17,21 @@ export const updateTokenList = async () => {
         },
       });
       if (!tokenDbEntry) {
-        await db.token.create({
-          data: {
-            address: token.address,
-            chainId: token.chainId,
-            logoURI: token.logoURI,
-            name: token.name,
-            symbol: token.symbol,
-            decimals: token.decimals,
-            extensions: token.extensions,
-          },
-        });
+        try {
+          await db.token.create({
+            data: {
+              address: token.address,
+              chainId: token.chainId,
+              logoURI: token.logoURI,
+              name: token.name,
+              symbol: token.symbol,
+              decimals: token.decimals,
+              extensions: token.extensions,
+            },
+          });
+        } catch (err) {
+          logger.error(err);
+        }
       }
     });
   } catch (err) {
