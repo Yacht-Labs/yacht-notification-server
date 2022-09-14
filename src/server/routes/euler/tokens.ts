@@ -5,7 +5,7 @@ import { BigNumber, ethers } from "ethers";
 import * as eulerLensContract from "../../../constants/abis/eulerLens.json";
 import { DatabaseResult, ProviderResult } from "../../../types/results";
 import { DatabaseError, ProviderError } from "../../../types/errors";
-import { getErrorMessage } from "../../../utils/getErrorMessage";
+import { getErrorMessage } from "../../../utils/";
 import logger from "../../../utils/logger";
 import { EulerToken, Token } from "@prisma/client";
 
@@ -59,7 +59,7 @@ const getEulerTokenDataByAddress = async (
   }
 };
 
-router.get("/tokens", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const eulerTokenData = await db.eulerToken.findMany({
       include: {
@@ -91,7 +91,7 @@ router.get("/tokens", async (req, res) => {
   }
 });
 
-router.get("/tokens/:address", async (req, res) => {
+router.get("/:address", async (req, res) => {
   const { address } = req.params;
   const eulerTokenData = await getEulerTokenDataByAddress(address);
   if (eulerTokenData instanceof DatabaseError) {

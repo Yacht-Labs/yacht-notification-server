@@ -3,7 +3,7 @@ import db from "../../../../../prisma/db";
 import logger from "../../../../utils/logger";
 const router = express.Router();
 
-router.post("/ir", async (req, res) => {
+router.post("/", async (req, res) => {
   const {
     deviceId,
     tokenAddress,
@@ -29,7 +29,6 @@ router.post("/ir", async (req, res) => {
         borrowLowerThreshold,
       },
     });
-    console.log({ irNotification });
     return res.json(irNotification);
   } catch (err) {
     logger.error(`Database error: ${err}`);
@@ -37,7 +36,7 @@ router.post("/ir", async (req, res) => {
   }
 });
 
-router.get("/ir/:deviceId", async (req, res) => {
+router.get("/:deviceId", async (req, res) => {
   const { deviceId } = req.params;
   try {
     const irNotifications = await db.eulerIRNotification.findMany({
@@ -46,6 +45,7 @@ router.get("/ir/:deviceId", async (req, res) => {
         isActive: true,
       },
     });
+    console.log({ irNotifications });
     return res.json(irNotifications);
   } catch (err) {
     logger.error(`Database error: ${err}`);
@@ -53,7 +53,7 @@ router.get("/ir/:deviceId", async (req, res) => {
   }
 });
 
-router.put("/ir/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const {
     borrowUpperThreshold,
@@ -62,6 +62,7 @@ router.put("/ir/:id", async (req, res) => {
     supplyLowerThreshold,
   } = req.body;
   try {
+    console.log(req.body);
     const updatedNotification = await db.eulerIRNotification.update({
       where: { id },
       data: {
@@ -78,7 +79,7 @@ router.put("/ir/:id", async (req, res) => {
   }
 });
 
-router.delete("/ir/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const notification = await db.eulerIRNotification.update({

@@ -42,23 +42,6 @@ export const getApnTeamId = (): string => {
   return getStringEnv("APN_TEAM_ID");
 };
 
-export const formatAPY = (rawAPY: string): number => {
-  if (rawAPY === "0") return 0;
-  const diff = rawAPY.length - 26;
-  if (diff === 0) {
-    return parseFloat(rawAPY[0] + "." + rawAPY.slice(1, 3));
-  }
-  if (diff < 0) {
-    return parseFloat(
-      "." + "0".repeat(Math.abs(diff) - 1) + rawAPY.slice(0, 3 + diff)
-    );
-  }
-  return parseFloat(
-    rawAPY.slice(0, diff + 1) +
-      (diff < 3 ? `.${rawAPY.slice(diff + 1, 3)}` : "")
-  );
-};
-
 export const getDbUser = (): string => {
   return isProduction()
     ? getStringEnv("RDS_USERNAME")

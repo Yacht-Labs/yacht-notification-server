@@ -20,7 +20,7 @@ import {
   ProviderError,
   YachtError,
 } from "../../../types/errors";
-import { getErrorMessage } from "../../../utils/getErrorMessage";
+import { getErrorMessage } from "../../../utils/";
 import logger from "../../../utils/logger";
 import { EulerToken, Token } from "@prisma/client";
 import { getSubAccountIdFromAccount } from "../../../utils";
@@ -164,7 +164,7 @@ const getEulerAccountBalances = async (
   return accountInfo;
 };
 
-router.get("/account/:address", async (req, res) => {
+router.get("/:address", async (req, res) => {
   const { address }: { address: string } = req.params;
   const topLevelAccountId = await getEulerTopLevelAccountId(address);
   if (topLevelAccountId instanceof GraphError) {

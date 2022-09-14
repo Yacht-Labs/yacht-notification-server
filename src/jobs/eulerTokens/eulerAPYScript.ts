@@ -1,7 +1,5 @@
-import { formatAPY, getEulerGraphEndpoint } from "../../utils/environment";
+import { getEulerGraphEndpoint } from "../../utils/";
 import { ProviderError } from "../../types/errors";
-import { ProviderResult } from "../../types/results";
-import { getErrorMessage } from "../../utils/getErrorMessage";
 import { request } from "graphql-request";
 import { ethers, BigNumber } from "ethers";
 import WebSocket from "ws";

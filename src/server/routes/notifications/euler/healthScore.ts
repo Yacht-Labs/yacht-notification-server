@@ -3,7 +3,7 @@ import db from "../../../../../prisma/db";
 import logger from "../../../../utils/logger";
 const router = express.Router();
 
-router.post("/health", async (req, res) => {
+router.post("/", async (req, res) => {
   const { accountId, thresholdValue, deviceId, subAccountId } = req.body;
   try {
     const healthNotification = await db.eulerHealthNotification.create({
@@ -25,7 +25,7 @@ router.post("/health", async (req, res) => {
   }
 });
 
-router.get("/health/:deviceId", async (req, res) => {
+router.get("/:deviceId", async (req, res) => {
   const { deviceId } = req.params;
   try {
     const healthNotifications = await db.eulerHealthNotification.findMany({
@@ -41,7 +41,7 @@ router.get("/health/:deviceId", async (req, res) => {
   }
 });
 
-router.put("/health/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { thresholdValue } = req.body;
   try {
@@ -61,7 +61,7 @@ router.put("/health/:id", async (req, res) => {
   }
 });
 
-router.delete("/health/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const healthNotification = await db.eulerHealthNotification.update({

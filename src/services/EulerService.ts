@@ -2,7 +2,7 @@ import { ProviderError } from "./../types/errors";
 import { BigNumber, ethers } from "ethers";
 import { getEulerSimpleLens, getProviderUrl } from "../utils/environment";
 import * as eulerLensContract from "../constants/abis/eulerLens.json";
-import { getErrorMessage } from "../utils/getErrorMessage";
+import { getErrorMessage } from "../utils/errors";
 
 export class EulerService {
   constructor() {}
