@@ -5,6 +5,7 @@ import {
   isProduction,
 } from "./../utils/environment";
 import apn from "apn";
+import logger from "../utils/logger";
 
 export class NotificationService {
   private provider: apn.Provider;
@@ -26,7 +27,7 @@ export class NotificationService {
     try {
       const res = await this.provider.send(note, deviceId);
     } catch (err) {
-      throw err;
+      logger.error(err);
     }
   }
 }

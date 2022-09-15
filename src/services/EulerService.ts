@@ -19,6 +19,7 @@ export class EulerService {
       );
       const { healthScore }: { healthScore: BigNumber } =
         await eulerLens.getAccountStatus(address);
+      console.log({ healthScore });
       return parseFloat(ethers.utils.formatEther(healthScore));
     } catch (err) {
       throw new ProviderError(getErrorMessage(err));

@@ -92,6 +92,8 @@ export class EulerNotificationService {
       typeof EulerHealthNotificationWithAccount
     >
   ) {
+    console.log({ healthScore });
+    console.log({ healthNotification });
     if (
       healthScore < healthNotification.thresholdValue &&
       !healthNotification.seen

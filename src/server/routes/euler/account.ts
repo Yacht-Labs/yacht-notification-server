@@ -20,7 +20,10 @@ import {
   ProviderError,
   YachtError,
 } from "../../../types/errors";
-import { getErrorMessage } from "../../../utils/";
+import {
+  getErrorMessage,
+  getSubAccountAddressFromAccount,
+} from "../../../utils/";
 import logger from "../../../utils/logger";
 import { EulerToken, Token } from "@prisma/client";
 import { getSubAccountIdFromAccount } from "../../../utils";
@@ -117,6 +120,7 @@ const getEulerAccountBalances = async (
 ): Promise<ProviderResult<any>> => {
   const accountInfo: {
     subAccountId: number;
+    subAccountAddress: string;
     supplies: { token: EulerToken & Token; amount: string }[];
     borrows: { token: EulerToken & Token; amount: string }[];
     healthScore: ProviderResult<number>;
@@ -156,6 +160,10 @@ const getEulerAccountBalances = async (
     }
     accountInfo.push({
       subAccountId: getSubAccountIdFromAccount(topLevelAccountId, account.id),
+      subAccountAddress: getSubAccountAddressFromAccount(
+        topLevelAccountId,
+        getSubAccountIdFromAccount(topLevelAccountId, account.id).toString()
+      ),
       supplies,
       borrows,
       healthScore,

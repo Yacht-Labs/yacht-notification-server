@@ -1,3 +1,5 @@
+const { logger } = require("ethers");
+
 const initialReconnectTimeout = 500;
 const reconnectTimeCeiling = 8000;
 
@@ -46,7 +48,7 @@ class EulerToolClient {
       const id = eulerClient.sub(
         { cmd: "sub", query: { topic: "rewardsIssuance" } },
         async (err, patch) => {
-          if (err) throw new Error(err.message);
+          if (err) logger.err(err.message);
 
           eulerClient.unsubscribe(id); // don't unsubscribe if using immer
 
