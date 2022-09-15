@@ -38,7 +38,7 @@ interface Patch {
   }[];
 }
 
-export const updateEulApy = async () =>
+export const updateEulApys = async () =>
   // : Promise<
   //   ProviderResult<{
   //     epoch: {
@@ -60,6 +60,7 @@ export const updateEulApy = async () =>
     const id = await eulerClient.sub(
       { cmd: "sub", query: { topic: "rewardsIssuance" } },
       async (err: Error, patch: Patch) => {
+        console.log("...Updating EUL APYs...");
         if (err) result = new ProviderError(err.message);
 
         eulerClient.unsubscribe(id); // don't unsubscribe if using immer
@@ -131,7 +132,7 @@ export const updateEulApy = async () =>
             },
           });
         }
-        console.log("---Finished updating EUL APYS---");
+        console.log("...Finished updating EUL APYS...\n");
         await eulerClient.shutdown();
         process.exit;
         return;

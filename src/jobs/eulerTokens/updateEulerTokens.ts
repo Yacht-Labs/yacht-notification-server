@@ -22,6 +22,7 @@ interface asset {
 }
 
 export const updateEulerTokens = async () => {
+  console.log("...Updating Euler Tokens...");
   const tokenQuery = gql`
     query {
       assets {
@@ -115,6 +116,7 @@ export const updateEulerTokens = async () => {
         process.exit(1);
       }
     }
+    console.log("...Finished updating Euler tokens...\n");
   } catch (err) {
     logger.error(`Euler graph error: ${err}`);
     process.exit(1);

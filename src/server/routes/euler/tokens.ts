@@ -11,27 +11,6 @@ import { EulerToken, Token } from "@prisma/client";
 
 const router = express.Router();
 
-// TODO: consolidate with the method in the eulernotification
-export const getHealthScoreByAddress = async (
-  address: string
-): Promise<ProviderResult<number>> => {
-  try {
-    const provider = new ethers.providers.JsonRpcProvider(
-      getProviderUrl(1) // mainnet
-    );
-    const eulerLens = new ethers.Contract(
-      getEulerSimpleLens(),
-      eulerLensContract.abi,
-      provider
-    );
-    const { healthScore }: { healthScore: BigNumber } =
-      await eulerLens.getAccountStatus(address);
-    return parseFloat(ethers.utils.formatEther(healthScore));
-  } catch (err) {
-    return new ProviderError(getErrorMessage(err));
-  }
-};
-
 const getEulerTokenDataByAddress = async (
   address: string
 ): Promise<DatabaseResult<EulerToken & Token>> => {

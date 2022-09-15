@@ -34,7 +34,6 @@
     "typescript": "^4.8.2"
   },
   "dependencies": {
-    "prisma": "^4.3.1",
     "@prisma/client": "^4.3.1",
     "apn": "^2.2.0",
     "bignumber.js": "^9.1.0",
@@ -44,6 +43,7 @@
     "graphql": "^16.6.0",
     "graphql-request": "^4.3.0",
     "node-cron": "^3.0.2",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "prisma": "^4.3.1"
   }
 }

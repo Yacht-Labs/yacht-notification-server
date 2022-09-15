@@ -58,10 +58,10 @@ model EulerIRNotification {
   deviceId             String     @db.VarChar(255)
   borrowAPY            Float?
   supplyAPY            Float?
-  borrowUpperThreshold Int?
-  borrowLowerThreshold Int?
-  supplyUpperThreshold Int?
-  supplyLowerThreshold Int?
+  borrowUpperThreshold Int
+  borrowLowerThreshold Int
+  supplyUpperThreshold Int
+  supplyLowerThreshold Int
   isActive             Boolean    @default(true)
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt

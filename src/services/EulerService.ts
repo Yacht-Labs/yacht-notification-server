@@ -5,7 +5,6 @@ import * as eulerLensContract from "../constants/abis/eulerLens.json";
 import { getErrorMessage } from "../utils/errors";
 
 export class EulerService {
-  constructor() {}
   public static async getHealthScoreByAddress(
     address: string
   ): Promise<number> {

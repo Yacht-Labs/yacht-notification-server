@@ -45,7 +45,6 @@ router.get("/:deviceId", async (req, res) => {
         isActive: true,
       },
     });
-    console.log({ irNotifications });
     return res.json(irNotifications);
   } catch (err) {
     logger.error(`Database error: ${err}`);
@@ -62,7 +61,6 @@ router.put("/:id", async (req, res) => {
     supplyLowerThreshold,
   } = req.body;
   try {
-    console.log(req.body);
     const updatedNotification = await db.eulerIRNotification.update({
       where: { id },
       data: {
