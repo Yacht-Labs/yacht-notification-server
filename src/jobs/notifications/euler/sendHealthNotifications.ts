@@ -2,6 +2,7 @@ import db from "../../../../prisma/db";
 import { EulerService } from "../../../services/EulerService";
 import { EulerNotificationService } from "../../../notifications/euler/EulerNotificationService";
 import logger from "../../../utils/logger";
+import { getSubAccountAddressFromAccount } from "../../../utils";
 
 export const sendHealthNotifications = async () => {
   try {
@@ -21,7 +22,10 @@ export const sendHealthNotifications = async () => {
     const notifier = new EulerNotificationService();
     for (const notification of healthNotifications) {
       const healthScore = await EulerService.getHealthScoreByAddress(
-        notification.account.address
+        getSubAccountAddressFromAccount(
+          notification.account.address,
+          notification.subAccountId
+        )
       );
       notifier.processHealthNotification(healthScore, notification);
     }

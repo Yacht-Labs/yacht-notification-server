@@ -4,7 +4,7 @@ import { EulerHealthNotification } from "@prisma/client";
 import { EulerService } from "../../../../services/EulerService";
 
 const mockSendNotification = jest.fn();
-jest.mock("../../../notifications/apn", () => {
+jest.mock("../../../../notifications/apn", () => {
   return {
     NotificationService: jest.fn().mockImplementation(() => {
       return {

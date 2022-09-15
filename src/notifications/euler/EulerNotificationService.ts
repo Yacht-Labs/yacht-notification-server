@@ -92,10 +92,16 @@ export class EulerNotificationService {
       typeof EulerHealthNotificationWithAccount
     >
   ) {
-    console.log({ healthScore });
-    console.log({ healthNotification });
     if (
-      healthScore < healthNotification.thresholdValue &&
+      healthNotification.seen &&
+      healthScore >= healthNotification.thresholdValue * 1.1
+    ) {
+      await db.eulerHealthNotification.update({
+        where: { id: healthNotification.id },
+        data: { seen: false },
+      });
+    } else if (
+      healthNotification.thresholdValue < healthScore &&
       !healthNotification.seen
     ) {
       try {
@@ -111,15 +117,6 @@ export class EulerNotificationService {
       } catch (err) {
         logger.error(`Error sending Euler health notification: ${err}`);
       }
-    }
-    if (
-      healthNotification.seen &&
-      healthScore >= healthNotification.thresholdValue * 1.1
-    ) {
-      await db.eulerHealthNotification.update({
-        where: { id: healthNotification.id },
-        data: { seen: false },
-      });
     }
   }
 }

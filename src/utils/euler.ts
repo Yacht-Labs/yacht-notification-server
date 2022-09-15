@@ -19,10 +19,10 @@ export function getSubAccountIdFromAccount(
 
 export function getSubAccountAddressFromAccount(
   primary: string,
-  subAccount: string
+  subAccountId: string
 ) {
   return utils.hexZeroPad(
-    BigNumber.from(primary).xor(subAccount).toHexString(),
+    BigNumber.from(primary).xor(subAccountId).toHexString(),
     20
   );
 }
