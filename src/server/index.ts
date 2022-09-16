@@ -1,3 +1,4 @@
+import { updateEulApys } from "./../jobs/eulerTokens/eulerAPYScript";
 import express from "express";
 import eulerRoutes from "./routes/euler/";
 import accountRoutes from "./routes/accounts";
