@@ -93,14 +93,6 @@ export class EulerNotificationService {
     >
   ) {
     if (
-      healthNotification.seen &&
-      healthScore >= healthNotification.thresholdValue * 1.1
-    ) {
-      await db.eulerHealthNotification.update({
-        where: { id: healthNotification.id },
-        data: { seen: false },
-      });
-    } else if (
       healthNotification.thresholdValue < healthScore &&
       !healthNotification.seen
     ) {
