@@ -97,7 +97,13 @@ export class EulerNotificationService {
       !healthNotification.seen
     ) {
       try {
-        const message = `Euler health score for ${healthNotification.account.name}, subAccountId ${healthNotification.subAccountId} has dropped below ${healthNotification.thresholdValue}!`;
+        const message = `Euler health score for ${
+          healthNotification.account.name
+        }, subAccountId ${
+          healthNotification.subAccountId
+        } has dropped below ${healthNotification.thresholdValue
+          .toString()
+          .slice(0, 2)}!`;
         await this.notificationService.sendNotification(
           message,
           healthNotification.deviceId
