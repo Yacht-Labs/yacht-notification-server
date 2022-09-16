@@ -1,7 +1,7 @@
 import { updateEulApys } from "./../jobs/eulerTokens/eulerAPYScript";
 import express from "express";
 import eulerRoutes from "./routes/euler/";
-import accountRoutes from "./routes/accounts";
+import accountRoutes from "./routes/account";
 import notificationRoutes from "./routes/notifications/";
 import { runJobs } from "../jobs";
 const app = express();
