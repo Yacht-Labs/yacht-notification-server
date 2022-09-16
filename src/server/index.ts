@@ -14,7 +14,6 @@ app.use("/notifications", notificationRoutes);
 app.use("/", (req, res) => {
   res.send("Hello World");
 });
-
 app.listen(port, async () => {
   console.log(`App listening on port ${port}`);
   await runJobs();
