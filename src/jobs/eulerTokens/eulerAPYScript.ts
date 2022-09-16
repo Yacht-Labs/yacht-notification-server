@@ -72,7 +72,7 @@ export const updateEulApys = async () =>
         const { epoch } = patch.result[0].value;
         const { tokens } = patch.result[0].value;
         const SECONDS_IN_YEAR = 31536000;
-        const AVERAGE_BLOCK_TIME = 13.6;
+        const AVERAGE_BLOCK_TIME = 12;
         const EPOCHS_PER_YEAR =
           SECONDS_IN_YEAR /
           AVERAGE_BLOCK_TIME /
