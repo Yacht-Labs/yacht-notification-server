@@ -1,3 +1,4 @@
+// @ts-nocheck
 const { logger } = require("ethers");
 
 const initialReconnectTimeout = 500;

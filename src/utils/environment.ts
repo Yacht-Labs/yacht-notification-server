@@ -14,7 +14,8 @@ export const getEulerGraphEndpoint = (): string => {
 };
 
 export const getApnAuthKey = (): string => {
-  return getStringEnv("NOTIFICATION_AUTHKEY");
+  const base64 = getStringEnv("NOTIFICATION_AUTHKEY");
+  return Buffer.from(base64, "base64").toString("ascii");
 };
 
 export const isProduction = (): boolean => {
