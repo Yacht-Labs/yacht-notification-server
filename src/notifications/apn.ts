@@ -17,7 +17,7 @@ export class NotificationService {
         keyId: getApnKeyId(),
         teamId: getApnTeamId(),
       },
-      production: isProduction(),
+      production: false,
     });
   }
   async sendNotification(message: string, deviceId: string): Promise<boolean> {
