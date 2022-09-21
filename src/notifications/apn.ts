@@ -20,7 +20,7 @@ export class NotificationService {
       production: isProduction(),
     });
   }
-  async sendNotification(message: string, deviceId: string) {
+  async sendNotification(message: string, deviceId: string): Promise<boolean> {
     console.log("Sending notification");
     const note = new apn.Notification();
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
@@ -28,8 +28,10 @@ export class NotificationService {
     note.topic = getApnBundleName();
     try {
       const res = await this.provider.send(note, deviceId);
+      return res.sent[0] ? true : false;
     } catch (err) {
       logger.error(err);
+      return false;
     }
   }
 }

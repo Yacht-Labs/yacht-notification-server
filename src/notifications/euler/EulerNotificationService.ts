@@ -53,16 +53,18 @@ export class EulerNotificationService {
       "borrow"
     );
     if (borrowNotification) {
-      await this.notificationService.sendNotification(
+      const success = await this.notificationService.sendNotification(
         borrowNotification,
         notification.deviceId
       );
-      await db.eulerIRNotification.update({
-        where: { id: notification.id },
-        data: {
-          borrowAPY,
-        },
-      });
+      if (success) {
+        await db.eulerIRNotification.update({
+          where: { id: notification.id },
+          data: {
+            borrowAPY,
+          },
+        });
+      }
     }
     const supplyNotification = this.buildIRNotification(
       notification.supplyAPY,
@@ -73,16 +75,18 @@ export class EulerNotificationService {
       "supply"
     );
     if (supplyNotification) {
-      await this.notificationService.sendNotification(
+      const success = await this.notificationService.sendNotification(
         supplyNotification,
         notification.deviceId
       );
-      await db.eulerIRNotification.update({
-        where: { id: notification.id },
-        data: {
-          supplyAPY,
-        },
-      });
+      if (success) {
+        await db.eulerIRNotification.update({
+          where: { id: notification.id },
+          data: {
+            supplyAPY,
+          },
+        });
+      }
     }
   }
 
@@ -104,14 +108,16 @@ export class EulerNotificationService {
         } has dropped below ${healthNotification.thresholdValue
           .toString()
           .slice(0, 2)}!`;
-        await this.notificationService.sendNotification(
+        const success = await this.notificationService.sendNotification(
           message,
           healthNotification.deviceId
         );
-        await db.eulerHealthNotification.update({
-          where: { id: healthNotification.id },
-          data: { seen: true },
-        });
+        if (success) {
+          await db.eulerHealthNotification.update({
+            where: { id: healthNotification.id },
+            data: { seen: true },
+          });
+        }
       } catch (err) {
         logger.error(`Error sending Euler health notification: ${err}`);
       }
