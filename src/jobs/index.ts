@@ -10,6 +10,8 @@ export const runJobs = () => {
     await updateTokenList();
     await updateEulerTokens();
     await updateEulApys();
+  });
+  cron.schedule("*/10 * * * * *", async () => {
     await sendHealthNotifications();
     await sendIRNotifications();
   });
