@@ -22,6 +22,11 @@ export const isProduction = (): boolean => {
   return process.env.PRODUCTION === "true" ? true : false;
 };
 
+export const getApnBundleName = (): string => {
+  const isProd = isProduction();
+  return isProd ? "com.YachtLabs.Yacht" : "com.YachtLabs.Yacht.dev";
+};
+
 export const getEulerSimpleLens = (): string => {
   return getStringEnv("EULER_SIMPLE_LENS");
 };

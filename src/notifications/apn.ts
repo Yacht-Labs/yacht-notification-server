@@ -1,5 +1,6 @@
 import {
   getApnAuthKey,
+  getApnBundleName,
   getApnKeyId,
   getApnTeamId,
   isProduction,
@@ -20,10 +21,11 @@ export class NotificationService {
     });
   }
   async sendNotification(message: string, deviceId: string) {
+    console.log("Sending notification");
     const note = new apn.Notification();
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
     note.alert = message;
-    note.topic = "com.YachtLabs.Yacht";
+    note.topic = getApnBundleName();
     try {
       const res = await this.provider.send(note, deviceId);
     } catch (err) {
