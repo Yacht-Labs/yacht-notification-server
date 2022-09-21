@@ -97,7 +97,7 @@ export class EulerNotificationService {
     >
   ) {
     if (
-      healthNotification.thresholdValue < healthScore &&
+      healthNotification.thresholdValue > healthScore &&
       !healthNotification.seen
     ) {
       try {
@@ -107,7 +107,10 @@ export class EulerNotificationService {
           healthNotification.subAccountId
         } has dropped below ${healthNotification.thresholdValue
           .toString()
-          .slice(0, 2)}!`;
+          .slice(
+            0,
+            healthNotification.thresholdValue.toString().indexOf(".") + 2
+          )}!`;
         const success = await this.notificationService.sendNotification(
           message,
           healthNotification.deviceId
