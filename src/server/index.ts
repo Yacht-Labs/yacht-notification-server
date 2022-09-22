@@ -3,6 +3,7 @@ import eulerRoutes from "./routes/euler/";
 import accountRoutes from "./routes/account";
 import notificationRoutes from "./routes/notifications/";
 import { runJobs } from "../jobs";
+import { sendIRNotifications } from "../jobs/notifications/euler/sendIRNotifications";
 const app = express();
 const port = 3000;
 
@@ -15,5 +16,6 @@ app.use("/", (req, res) => {
 });
 app.listen(port, async () => {
   console.log(`App listening on port ${port}`);
-  await runJobs();
+  await sendIRNotifications();
+  // await runJobs();
 });

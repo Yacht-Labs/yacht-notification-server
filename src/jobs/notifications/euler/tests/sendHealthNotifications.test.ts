@@ -2,8 +2,9 @@ import { sendHealthNotifications } from "../sendHealthNotifications";
 import { prismaMock } from "../../../../../test/singleton";
 import { EulerHealthNotification } from "@prisma/client";
 import { EulerService } from "../../../../services/EulerService";
+import { getSubAccountAddressFromAccount } from "../../../../utils";
 
-const mockSendNotification = jest.fn();
+const mockSendNotification = jest.fn().mockResolvedValue(true);
 jest.mock("../../../../notifications/apn", () => {
   return {
     NotificationService: jest.fn().mockImplementation(() => {
@@ -13,6 +14,10 @@ jest.mock("../../../../notifications/apn", () => {
     }),
   };
 });
+
+jest.mock("../../../../utils", () => ({
+  getSubAccountAddressFromAccount: jest.fn(),
+}));
 
 const ACCOUNT_ID = "100";
 const DEVICE_ID = "100";
@@ -65,6 +70,7 @@ describe("Euler Notifications", () => {
       const updateMock = mockUpdateNotification(baseHealthNotification, true);
       await sendHealthNotifications();
       expect(mockSendNotification).toHaveBeenCalledTimes(1);
+      console.log({ updateMock });
       expect(updateMock).toHaveBeenCalledTimes(1);
     });
 
@@ -88,31 +94,6 @@ describe("Euler Notifications", () => {
       await sendHealthNotifications();
       expect(mockSendNotification).toHaveBeenCalledTimes(0);
       expect(updateMock).toHaveBeenCalledTimes(0);
-    });
-
-    test("Should not update a notification's seen key if it's not above 10%", async () => {
-      mockFindHealthNotifications({
-        ...baseHealthNotification,
-        thresholdValue: 2.1,
-        seen: true,
-      });
-      const updateMock = mockUpdateNotification(baseHealthNotification, true);
-      await sendHealthNotifications();
-      expect(mockSendNotification).toHaveBeenCalledTimes(0);
-      expect(updateMock).toHaveBeenCalledTimes(0);
-    });
-
-    test("Should update a notification's seen key if it's above 10%", async () => {
-      EulerService.getHealthScoreByAddress = jest.fn().mockResolvedValue(2.2);
-      mockFindHealthNotifications({
-        ...baseHealthNotification,
-        thresholdValue: 2,
-        seen: true,
-      });
-      const updateMock = mockUpdateNotification(baseHealthNotification, true);
-      await sendHealthNotifications();
-      expect(mockSendNotification).toHaveBeenCalledTimes(0);
-      expect(updateMock).toHaveBeenCalledTimes(1);
     });
   });
 });

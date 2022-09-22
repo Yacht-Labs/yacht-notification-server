@@ -9,6 +9,11 @@ import db from "../../../prisma/db";
 import logger from "../../utils/logger";
 import { EulerHealthNotificationWithAccount } from "../../types";
 
+enum IRNotificationType {
+  BORROW = "Borrow",
+  SUPPLY = "Supply",
+}
+
 export class EulerNotificationService {
   notificationService = new NotificationService();
   constructor() {}
@@ -26,12 +31,12 @@ export class EulerNotificationService {
       return notificationText;
     }
     if (lowerThreshold) {
-      if (realAPY < notificationAPY * (1 - lowerThreshold)) {
+      if (realAPY <= notificationAPY * (1 - lowerThreshold / 100)) {
         notificationText = `The Euler ${type}APY on ${symbol} is now ${realAPY}!`;
       }
     }
     if (upperThreshold) {
-      if (realAPY > notificationAPY * (1 + upperThreshold)) {
+      if (realAPY >= notificationAPY * (1 + upperThreshold / 100)) {
         notificationText = `The Euler ${type}APY on ${symbol} is now ${realAPY}!`;
       }
     }
@@ -50,7 +55,7 @@ export class EulerNotificationService {
       notification.borrowLowerThreshold,
       notification.borrowUpperThreshold,
       symbol,
-      "borrow"
+      IRNotificationType.BORROW
     );
     if (borrowNotification) {
       const success = await this.notificationService.sendNotification(
@@ -72,7 +77,7 @@ export class EulerNotificationService {
       notification.supplyLowerThreshold,
       notification.supplyUpperThreshold,
       symbol,
-      "supply"
+      IRNotificationType.SUPPLY
     );
     if (supplyNotification) {
       const success = await this.notificationService.sendNotification(

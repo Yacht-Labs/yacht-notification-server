@@ -2,14 +2,15 @@
   "name": "yacht-notification-service",
   "version": "1.0.0",
   "description": "yacht notification service",
-  "main": "./dist/src/server/index.js",
+  "main": "./out/src/server/index.js",
   "engines": {
     "node": "^14.0.0"
   },
   "scripts": {
     "test": "jest -i",
+    "build": "tsc",
     "db-fix": "npm run db-reset && npm run db-deploy",
-    "start": "tsc && node ./dist/src/server/index.js",
+    "start": "tsc && node ./out/src/server/index.js",
     "db-init": "ts-node src/scripts/initTokenDb.ts",
     "db-migrate": "ts-node prisma/scripts/migrateScript.ts",
     "db-generate": "ts-node prisma/scripts/generateScript.ts",
