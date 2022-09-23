@@ -7,6 +7,8 @@ import {
 } from "./../utils/environment";
 import apn from "apn";
 import logger from "../utils/logger";
+import { NotificationType } from "../types";
+import db from "../../prisma/db";
 
 export class NotificationService {
   private provider: apn.Provider;
@@ -20,7 +22,12 @@ export class NotificationService {
       production: false,
     });
   }
-  async sendNotification(message: string, deviceId: string): Promise<boolean> {
+  async sendNotification(
+    message: string,
+    deviceId: string,
+    notificationId: string,
+    notificationType: NotificationType
+  ): Promise<boolean> {
     console.log("Sending notification");
     const note = new apn.Notification();
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
@@ -28,6 +35,20 @@ export class NotificationService {
     note.topic = getApnBundleName();
     try {
       const res = await this.provider.send(note, deviceId);
+      try {
+        await db.notificationEvent.create({
+          data: {
+            notificationId,
+            type: notificationType,
+            payload: message,
+            response: res.sent.length
+              ? (res.sent[0] as any)
+              : (res.failed[0] as any),
+          },
+        });
+      } catch (err) {
+        logger.error("Error saving notification to DB");
+      }
       return res.sent[0] ? true : false;
     } catch (err) {
       logger.error(err);

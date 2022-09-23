@@ -7,7 +7,10 @@ import {
 import { Prisma } from "@prisma/client";
 import db from "../../../prisma/db";
 import logger from "../../utils/logger";
-import { EulerHealthNotificationWithAccount } from "../../types";
+import {
+  EulerHealthNotificationWithAccount,
+  NotificationType,
+} from "../../types";
 
 enum IRNotificationType {
   BORROW = "Borrow",
@@ -60,7 +63,9 @@ export class EulerNotificationService {
     if (borrowNotification) {
       const success = await this.notificationService.sendNotification(
         borrowNotification,
-        notification.deviceId
+        notification.deviceId,
+        notification.id,
+        NotificationType.EulerIR
       );
       if (success) {
         await db.eulerIRNotification.update({
@@ -82,7 +87,9 @@ export class EulerNotificationService {
     if (supplyNotification) {
       const success = await this.notificationService.sendNotification(
         supplyNotification,
-        notification.deviceId
+        notification.deviceId,
+        notification.id,
+        NotificationType.EulerIR
       );
       if (success) {
         await db.eulerIRNotification.update({
@@ -118,7 +125,9 @@ export class EulerNotificationService {
           )}!`;
         const success = await this.notificationService.sendNotification(
           message,
-          healthNotification.deviceId
+          healthNotification.deviceId,
+          healthNotification.id,
+          NotificationType.EulerHealthScore
         );
         if (success) {
           await db.eulerHealthNotification.update({

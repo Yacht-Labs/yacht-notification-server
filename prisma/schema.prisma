@@ -67,6 +67,14 @@ model EulerIRNotification {
   updatedAt            DateTime   @updatedAt
 }
 
+model NotificationEvent {
+  id             String @id @default(uuid())
+  payload        String
+  notificationId String
+  type           String
+  response       Json?
+}
+
 model EulerHealthNotification {
   id             String   @id @default(uuid())
   account        Account  @relation(fields: [accountId], references: [id])
