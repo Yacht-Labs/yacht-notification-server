@@ -7,11 +7,9 @@ import { updateEulApys } from "./eulerTokens/eulerAPYScript";
 
 export const runJobs = () => {
   cron.schedule("* * * * *", async () => {
-    // await updateTokenList();
-    // await updateEulerTokens();
-    // await updateEulApys();
-  });
-  cron.schedule("*/10 * * * * *", async () => {
+    await updateTokenList();
+    await updateEulerTokens();
+    await updateEulApys();
     await sendHealthNotifications();
     await sendIRNotifications();
   });

@@ -16,6 +16,5 @@ app.use("/", (req, res) => {
 });
 app.listen(port, async () => {
   console.log(`App listening on port ${port}`);
-  await sendIRNotifications();
-  // await runJobs();
+  await runJobs();
 });
