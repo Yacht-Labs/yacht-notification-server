@@ -10,7 +10,7 @@
     "test": "jest -i",
     "build": "tsc",
     "db-fix": "npm run db-reset && npm run db-deploy",
-    "start": "npm run db-fix && tsc && node ./out/src/server/index.js",
+    "start": "tsc && node ./out/src/server/index.js",
     "db-init": "ts-node src/scripts/initTokenDb.ts",
     "db-migrate": "ts-node prisma/scripts/migrateScript.ts",
     "db-generate": "ts-node prisma/scripts/generateScript.ts",
