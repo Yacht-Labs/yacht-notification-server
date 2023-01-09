@@ -87,3 +87,11 @@ model EulerHealthNotification {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
+model LitPkpSwap {
+  pkpPublicKey String @id
+  chainAParams Json
+  chainBParams Json
+  address      String
+  ipfsCID      String
+}

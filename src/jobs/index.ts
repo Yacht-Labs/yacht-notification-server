@@ -4,13 +4,16 @@ import { sendIRNotifications } from "./notifications/euler/sendIRNotifications";
 import { updateTokenList } from "./updateTokens";
 import { updateEulerTokens } from "./eulerTokens/updateEulerTokens";
 import { updateEulApys } from "./eulerTokens/eulerAPYScript";
+import { isTest } from "../utils";
 
 export const runJobs = () => {
-  cron.schedule("* * * * *", async () => {
-    await updateTokenList();
-    await updateEulerTokens();
-    await updateEulApys();
-    await sendHealthNotifications();
-    await sendIRNotifications();
-  });
+  if (!isTest()) {
+    cron.schedule("* * * * *", async () => {
+      await updateTokenList();
+      await updateEulerTokens();
+      // await updateEulApys();
+      await sendHealthNotifications();
+      await sendIRNotifications();
+    });
+  }
 };

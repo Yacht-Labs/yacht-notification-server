@@ -2,15 +2,16 @@ import express from "express";
 import eulerRoutes from "./routes/euler/";
 import accountRoutes from "./routes/account";
 import notificationRoutes from "./routes/notifications/";
+import litRoutes from "./routes/lit/routes";
 import { runJobs } from "../jobs";
-import { sendIRNotifications } from "../jobs/notifications/euler/sendIRNotifications";
-const app = express();
+export const app = express();
 const port = 3000;
 
 app.use(express.json());
 app.use("/euler", eulerRoutes);
 app.use("/accounts", accountRoutes);
 app.use("/notifications", notificationRoutes);
+app.use("/lit", litRoutes);
 app.use("/", (req, res) => {
   res.send("Hello World");
 });

@@ -22,6 +22,10 @@ export const isProduction = (): boolean => {
   return process.env.PRODUCTION === "true" ? true : false;
 };
 
+export const isTest = (): boolean => {
+  return process.env.NODE_ENV === "test" ? true : false;
+};
+
 export const getApnBundleName = (): string => {
   const isProd = isProduction();
   return isProd ? "com.YachtLabs.Yacht" : "com.YachtLabs.Yacht.dev";
@@ -35,6 +39,8 @@ export const getProviderUrl = (chainId: number): string => {
   switch (chainId) {
     case 1:
       return getStringEnv("MAINNET_PROVIDER_URL");
+    case 80001:
+      return getStringEnv("MUMBAI_PROVIDER_URL");
     default:
       return getStringEnv("MAINNET_PROVIDER_URL");
   }
@@ -76,4 +82,8 @@ export const getDbName = (): string => {
 
 export const getDbEndpoint = (): string => {
   return `postgresql://${getDbUser()}:${getDbPassword()}@${getDbHost()}:${getDbPort()}/${getDbName()}?schema=public`;
+};
+
+export const getMumbaiPrivateKey = (): string => {
+  return getStringEnv("MUMBAI_PRIVATE_KEY");
 };
