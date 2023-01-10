@@ -32,6 +32,7 @@ function mockFindHealthNotifications(
     ...args,
   ]);
 }
+
 function mockUpdateNotification(
   healthNotification: EulerHealthNotification,
   seen: boolean

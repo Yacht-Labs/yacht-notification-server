@@ -37,39 +37,44 @@ router.post("/mintSwapPkp", async (req, res) => {
     }
     return true;
   }
-  const ipfs = await create({ start: false, offline: true });
   try {
-    const {
-      chainAParams,
-      chainBParams,
-    }: { chainAParams: LitERC20SwapParam; chainBParams: LitERC20SwapParam } =
-      req.body;
-    if (!checkParams(chainAParams) || !checkParams(chainBParams)) {
-      return res.status(400).send("Invalid params");
-    }
-    const litActionCode = litSdk.createERC20SwapLitAction(
-      chainAParams,
-      chainBParams
-    );
-    const ipfsCID = (
-      await ipfs.add(litActionCode, { onlyHash: true })
-    ).cid.toString();
-    const pkpInfo = await litSdk.mintGrantBurnWithLitAction(ipfsCID);
-    await db.litPkpSwap.create({
-      data: {
+    const ipfs = await create({ start: false, offline: true });
+    try {
+      const {
         chainAParams,
         chainBParams,
-        pkpPublicKey: pkpInfo.publicKey,
-        ipfsCID,
-        address: pkpInfo.address,
-      },
-    });
-    return res.json({ ipfsCID, ...pkpInfo });
+      }: { chainAParams: LitERC20SwapParam; chainBParams: LitERC20SwapParam } =
+        req.body;
+      if (!checkParams(chainAParams) || !checkParams(chainBParams)) {
+        return res.status(400).send("Invalid params");
+      }
+      const litActionCode = litSdk.createERC20SwapLitAction(
+        chainAParams,
+        chainBParams
+      );
+      const ipfsCID = (
+        await ipfs.add(litActionCode, { onlyHash: true })
+      ).cid.toString();
+      const pkpInfo = await litSdk.mintGrantBurnWithLitAction(ipfsCID);
+      await db.litPkpSwap.create({
+        data: {
+          chainAParams,
+          chainBParams,
+          pkpPublicKey: pkpInfo.publicKey,
+          ipfsCID,
+          address: pkpInfo.address,
+        },
+      });
+      return res.json({ ipfsCID, ...pkpInfo });
+    } catch (err) {
+      console.log(err);
+      return res.sendStatus(500);
+    } finally {
+      await ipfs.stop();
+    }
   } catch (err) {
     console.log(err);
     return res.sendStatus(500);
-  } finally {
-    await ipfs.stop();
   }
 });
 
@@ -94,11 +99,6 @@ router.post("/runLitAction", async (req, res) => {
         litPkpSwap.chainAParams,
         litPkpSwap.chainBParams
       );
-      fs.writeFileSync(
-        path.resolve(__dirname, "litActionCode.txt"),
-        code,
-        "utf8"
-      );
       const litActionCodeResponse = await litSdk.runLitAction({
         pkpPublicKey,
         code,
@@ -117,7 +117,7 @@ router.post("/runLitAction", async (req, res) => {
 router.get("/swapObjects/:counterPartyAddress", async (req, res) => {
   const { counterPartyAddress } = req.params;
   // check that counterPartyAddress is a valid address
-  if (!counterPartyAddress) {
+  if (counterPartyAddress.length !== 42) {
     return res.status(400).send("Invalid counterPartyAddress");
   }
   try {
@@ -149,10 +149,6 @@ router.get("/swapObjects/:counterPartyAddress", async (req, res) => {
 // create a route /lit/swapObject/:pkpPublicKey that gets a single litPkpSwap object with the correct pkpPublicKey
 router.get("/swapObject/:pkpPublicKey", async (req, res) => {
   const { pkpPublicKey } = req.params;
-  // check that pkpPublicKey is a valid pkpPublicKey
-  if (!pkpPublicKey) {
-    return res.status(400).send("Invalid pkpPublicKey");
-  }
   try {
     const litPkpSwap = await db.litPkpSwap.findUnique({
       where: { pkpPublicKey },

@@ -12,10 +12,10 @@ app.use("/euler", eulerRoutes);
 app.use("/accounts", accountRoutes);
 app.use("/notifications", notificationRoutes);
 app.use("/lit", litRoutes);
-app.use("/", (req, res) => {
-  res.send("Hello World");
-});
-app.listen(port, async () => {
+// app.use("/", (req, res) => {
+//   res.send("Hello World");
+// });
+export const server = app.listen(port, async () => {
   console.log(`App listening on port ${port}`);
   await runJobs();
 });

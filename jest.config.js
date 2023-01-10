@@ -3,4 +3,5 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
   setupFilesAfterEnv: ["./test/singleton.ts"],
+  modulePathIgnorePatterns: ["<rootDir>/out/"],
 };
