@@ -9,11 +9,11 @@ import { isTest } from "../utils";
 export const runJobs = () => {
   if (!isTest()) {
     cron.schedule("* * * * *", async () => {
-      await updateTokenList();
-      await updateEulerTokens();
+      // await updateTokenList();
+      // await updateEulerTokens();
       // await updateEulApys();
-      await sendHealthNotifications();
-      await sendIRNotifications();
+      // await sendHealthNotifications();
+      // await sendIRNotifications();
     });
   }
 };
