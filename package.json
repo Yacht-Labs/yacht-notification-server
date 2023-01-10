@@ -47,7 +47,7 @@
     "graphql": "^16.6.0",
     "graphql-request": "^4.3.0",
     "ipfs-core": "^0.14.0",
-    "lit-swap-sdk": "file:/Users/traus/dev/yacht/lit/yacht-lit-sdk",
+    "lit-swap-sdk": "^1.1.9",
     "node-cron": "^3.0.2",
     "node-fetch": "^2.6.7",
     "prisma": "^4.3.1"
