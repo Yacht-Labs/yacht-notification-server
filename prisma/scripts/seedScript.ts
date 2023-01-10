@@ -5,7 +5,7 @@ import { updateEulerTokens } from "../../src/jobs/eulerTokens/updateEulerTokens"
 async function seedDb() {
   await updateTokenList();
   await updateEulerTokens();
-  await updateEulApys();
+  // await updateEulApys();
 }
 
 seedDb();
