@@ -17,5 +17,6 @@ app.get("/", (req, res) => {
 });
 export const server = app.listen(port, async () => {
   console.log(`App listening on port ${port}`);
+  console.log("NODE_ENV var: ", process.env.NODE_ENV);
   await runJobs();
 });
