@@ -1,3 +1,5 @@
+You must be running on Node version ^16
+
 To run the docker postgres container:
 `docker run --name yacht-notification-server -p 5432:5432 -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -d postgres`
 

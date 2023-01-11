@@ -4,7 +4,7 @@
   "description": "yacht notification service",
   "main": "./out/src/server/index.js",
   "engines": {
-    "node": "^14.0.0 || ^18.0.0"
+    "node": "^16.0.0"
   },
   "scripts": {
     "test": "jest -i",
@@ -18,7 +18,8 @@
     "db-view": "ts-node prisma/scripts/studioScript.ts",
     "db-reset": "ts-node prisma/scripts/resetScript.ts",
     "db-seed": "ts-node prisma/scripts/seedScript.ts",
-    "dev": "nodemon src/server/index.ts"
+    "dev": "nodemon src/server/index.ts",
+    "run-production": "npm run db-deploy && npm start"
   },
   "author": "Yacht Labs Inc.",
   "license": "ISC",

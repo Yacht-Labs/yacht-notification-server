@@ -2,8 +2,6 @@ import express from "express";
 import litSdk from "./sdk";
 import { create } from "ipfs-core";
 import db from "../../../../prisma/db";
-import fs from "fs";
-import path from "path";
 type LitERC20SwapParam = {
   counterPartyAddress: string;
   tokenAddress: string;
