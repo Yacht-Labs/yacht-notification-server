@@ -19,7 +19,7 @@
     "db-reset": "ts-node prisma/scripts/resetScript.ts",
     "db-seed": "ts-node prisma/scripts/seedScript.ts",
     "dev": "nodemon src/server/index.ts",
-    "run-production": "npm run db-deploy && npm start"
+    "start-production": "npm run db-deploy && npm start"
   },
   "author": "Yacht Labs Inc.",
   "license": "ISC",

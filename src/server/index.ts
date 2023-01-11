@@ -12,7 +12,7 @@ app.use("/euler", eulerRoutes);
 app.use("/accounts", accountRoutes);
 app.use("/notifications", notificationRoutes);
 app.use("/lit", litRoutes);
-app.use("/", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Hello World");
 });
 export const server = app.listen(port, async () => {

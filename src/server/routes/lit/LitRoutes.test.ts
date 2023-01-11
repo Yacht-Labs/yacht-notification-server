@@ -61,7 +61,6 @@ describe("Lit Swap Routes", () => {
 
   describe("/mintSwapPkp", () => {
     it("should return 200 when passed proper parameters", async () => {
-      const params = properSwapParams;
       const prismaLitMockCreate =
         prismaMock.litPkpSwap.create.mockResolvedValueOnce(
           litPkpSwapModelInstance
@@ -69,7 +68,7 @@ describe("Lit Swap Routes", () => {
       const response = await request(app)
         .post("/lit/mintSwapPkp")
         .set("Content-Type", "application/json")
-        .send(JSON.stringify(params))
+        .send(JSON.stringify(properSwapParams))
         .set("Accept", "application/json");
       expect(prismaLitMockCreate).toHaveBeenCalled();
       expect(response.status).toEqual(200);
