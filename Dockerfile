@@ -1,8 +1,8 @@
-FROM node:16.13.2
+FROM node:16
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 3000
 RUN npx prisma generate
-CMD ["npm", "run", "start-production"]
+CMD ["npm", "start"]
