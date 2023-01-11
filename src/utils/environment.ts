@@ -36,6 +36,9 @@ export const getEulerSimpleLens = (): string => {
 };
 
 export const getProviderUrl = (chainId: number): string => {
+  if (isTest()) {
+    return "http://localhost:999999999";
+  }
   switch (chainId) {
     case 1:
       return getStringEnv("MAINNET_PROVIDER_URL");
