@@ -2,6 +2,10 @@ branch-defaults:
   master:
     environment: yacht-devops
     group_suffix: null
+environment-defaults:
+  yacht-devops:
+    branch: null
+    repository: null
 global:
   application_name: yacht-server
   branch: null
