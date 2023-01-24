@@ -77,7 +77,15 @@ router.post("/mintSwapPkp", async (req, res) => {
 });
 
 router.post("/runLitAction", async (req, res) => {
-  const { pkpPublicKey }: { pkpPublicKey: string } = req.body;
+  const {
+    pkpPublicKey,
+    chainAMaxFeePerGas,
+    chainBMaxFeePerGas,
+  }: {
+    pkpPublicKey: string;
+    chainAMaxFeePerGas: string;
+    chainBMaxFeePerGas: string;
+  } = req.body;
   if (!pkpPublicKey) {
     return res.status(400).send("Invalid params");
   }
@@ -100,6 +108,8 @@ router.post("/runLitAction", async (req, res) => {
       const litActionCodeResponse = await litSdk.runLitAction({
         pkpPublicKey,
         code,
+        chainAMaxFeePerGas,
+        chainBMaxFeePerGas,
       });
       return res.json(litActionCodeResponse);
     } else {
