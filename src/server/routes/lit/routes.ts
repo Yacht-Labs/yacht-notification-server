@@ -61,13 +61,14 @@ router.post("/mintSwapPkp", async (req, res) => {
         await ipfs.add(litActionCode, { onlyHash: true })
       ).cid.toString();
       const pkpInfo = await litSdk.mintGrantBurnWithLitAction(ipfsCID);
+      const pkpInfoUpdate = { ...pkpInfo, pkpPublicKey: pkpInfo.publicKey };
       await db.litPkpSwap.create({
         data: {
           chainAParams,
           chainBParams,
-          pkpPublicKey: pkpInfo.publicKey,
+          pkpPublicKey: pkpInfoUpdate.pkpPublicKey,
           ipfsCID,
-          address: pkpInfo.address,
+          address: pkpInfoUpdate.address,
         },
       });
       return res.json({ ipfsCID, ...pkpInfo, pkpPublicKey: pkpInfo.publicKey });
