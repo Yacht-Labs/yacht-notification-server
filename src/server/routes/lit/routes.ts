@@ -2,12 +2,19 @@ import express from "express";
 import litSdk from "./sdk";
 import { create } from "ipfs-core";
 import db from "../../../../prisma/db";
+import { BigNumber } from "ethers";
 type LitERC20SwapParam = {
   counterPartyAddress: string;
   tokenAddress: string;
   chain: string;
   amount: string;
   decimals: number;
+};
+
+export type GasConfig = {
+  maxFeePerGas: BigNumber | string;
+  maxPriorityFeePerGas: BigNumber | string;
+  gasLimit: BigNumber | string;
 };
 
 function isLitSwapParam(param: any): param is LitERC20SwapParam {
@@ -63,7 +70,7 @@ router.post("/mintSwapPkp", async (req, res) => {
           address: pkpInfo.address,
         },
       });
-      return res.json({ ipfsCID, ...pkpInfo });
+      return res.json({ ipfsCID, ...pkpInfo, pkpPublicKey: pkpInfo.publicKey });
     } catch (err) {
       console.log(err);
       return res.sendStatus(500);
@@ -79,12 +86,12 @@ router.post("/mintSwapPkp", async (req, res) => {
 router.post("/runLitAction", async (req, res) => {
   const {
     pkpPublicKey,
-    chainAMaxFeePerGas,
-    chainBMaxFeePerGas,
+    chainAGasConfig,
+    chainBGasConfig,
   }: {
     pkpPublicKey: string;
-    chainAMaxFeePerGas: string;
-    chainBMaxFeePerGas: string;
+    chainAGasConfig: GasConfig;
+    chainBGasConfig: GasConfig;
   } = req.body;
   if (!pkpPublicKey) {
     return res.status(400).send("Invalid params");
@@ -108,9 +115,10 @@ router.post("/runLitAction", async (req, res) => {
       const litActionCodeResponse = await litSdk.runLitAction({
         pkpPublicKey,
         code,
-        chainAMaxFeePerGas,
-        chainBMaxFeePerGas,
+        chainAGasConfig,
+        chainBGasConfig,
       });
+      console.log(litActionCodeResponse);
       return res.json(litActionCodeResponse);
     } else {
       res.status(400).send("Invalid PKP public key");

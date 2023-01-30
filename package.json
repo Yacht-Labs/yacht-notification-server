@@ -48,7 +48,7 @@
     "graphql": "^16.6.0",
     "graphql-request": "^4.3.0",
     "ipfs-core": "^0.14.0",
-    "lit-swap-sdk": "^1.1.12",
+    "lit-swap-sdk": "1.1.13",
     "node-cron": "^3.0.2",
     "node-fetch": "^2.6.7",
     "prisma": "^4.3.1"
