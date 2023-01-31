@@ -92,3 +92,21 @@ export const getMumbaiPrivateKey = (): string => {
     ? "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
     : getStringEnv("MUMBAI_PRIVATE_KEY");
 };
+
+export const getAwsAccessKeyId = (): string => {
+  return getStringEnv("AWS_ACCESS_KEY_ID");
+};
+
+export const getAwsSecretKey = (): string => {
+  return getStringEnv("AWS_SECRET_KEY");
+};
+
+export const getAwsLogGroup = (): string => {
+  return getStringEnv("AWS_LOG_GROUP");
+};
+export const getAwsLogStream = (): string => {
+  return getStringEnv("AWS_LOG_STREAM");
+};
+export const getAwsRegion = (): string => {
+  return getStringEnv("AWS_REGION");
+};
