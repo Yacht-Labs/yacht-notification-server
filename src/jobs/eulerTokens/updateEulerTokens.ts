@@ -2,7 +2,7 @@ import db from "../../../prisma/db";
 import { gql, request } from "graphql-request";
 import { getEulerGraphEndpoint, formatAPY } from "../../utils/";
 import BigNumberJs from "bignumber.js";
-import logger from "../../utils/logger";
+import logger from "../../utils/Logging/logger";
 
 interface asset {
   id: string;

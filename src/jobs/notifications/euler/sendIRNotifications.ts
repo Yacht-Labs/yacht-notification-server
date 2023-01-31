@@ -1,6 +1,6 @@
 import { EulerNotificationService } from "./../../../notifications/euler/EulerNotificationService";
 import db from "../../../../prisma/db";
-import logger from "../../../utils/logger";
+import logger from "../../../utils/Logging/logger";
 
 export const sendIRNotifications = async () => {
   try {

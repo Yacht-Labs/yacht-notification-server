@@ -1,7 +1,7 @@
 import db from "../../../../prisma/db";
 import { EulerService } from "../../../services/EulerService";
 import { EulerNotificationService } from "../../../notifications/euler/EulerNotificationService";
-import logger from "../../../utils/logger";
+import logger from "../../../utils/Logging/logger";
 import { getSubAccountAddressFromAccount } from "../../../utils";
 
 export const sendHealthNotifications = async () => {

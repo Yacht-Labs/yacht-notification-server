@@ -1,6 +1,6 @@
 import { TokenInfo } from "./../types/Euler";
 import db from "../../prisma/db";
-import logger from "../utils/logger";
+import logger from "../utils/Logging/logger";
 import fetch from "node-fetch";
 
 export const updateTokenList = async () => {

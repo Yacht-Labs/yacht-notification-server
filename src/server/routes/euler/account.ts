@@ -24,7 +24,7 @@ import {
   getErrorMessage,
   getSubAccountAddressFromAccount,
 } from "../../../utils/";
-import logger from "../../../utils/logger";
+import logger from "../../../utils/Logging/logger";
 import { EulerToken, Token } from "@prisma/client";
 import { getSubAccountIdFromAccount } from "../../../utils";
 

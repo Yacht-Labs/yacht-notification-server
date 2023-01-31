@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../utils/Logging/logger";
 
 enum ErrorTypes {
   BUSINESS_LOGIC = "BusinessLogic",

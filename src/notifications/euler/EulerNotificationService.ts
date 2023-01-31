@@ -6,7 +6,7 @@ import {
 } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import db from "../../../prisma/db";
-import logger from "../../utils/logger";
+import logger from "../../utils/Logging/logger";
 import {
   EulerHealthNotificationWithAccount,
   NotificationType,
