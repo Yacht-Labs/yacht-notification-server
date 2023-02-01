@@ -13,6 +13,10 @@ export const getEulerGraphEndpoint = (): string => {
   return getStringEnv("EULER_GRAPH_ENDPOINT");
 };
 
+export const getEulerTokenEndpoint = (): string => {
+  return getStringEnv("EULER_TOKEN_ENDPOINT");
+};
+
 export const getApnAuthKey = (): string => {
   const base64 = getStringEnv("NOTIFICATION_AUTHKEY");
   return Buffer.from(base64, "base64").toString("ascii");
