@@ -1,5 +1,6 @@
 import morgan from "morgan";
 import json from "morgan-json";
+import { isProduction } from "../environment";
 import logger from "./logger";
 const format = json({
   method: ":method",
@@ -14,15 +15,16 @@ const httpLogger = morgan(format, {
     write: (message) => {
       const { method, url, status, contentLength, responseTime } =
         JSON.parse(message);
-
-      logger.info("HTTP Access Log", {
-        timestamp: new Date().toString(),
-        method,
-        url,
-        status: Number(status),
-        contentLength,
-        responseTime: Number(responseTime),
-      });
+      if (isProduction()) {
+        logger.info("HTTP Access Log", {
+          timestamp: new Date().toString(),
+          method,
+          url,
+          status: Number(status),
+          contentLength,
+          responseTime: Number(responseTime),
+        });
+      }
     },
   },
 });

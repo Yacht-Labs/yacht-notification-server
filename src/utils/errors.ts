@@ -18,7 +18,8 @@ export default class ErrorHandler {
   ): void {
     const status = error.status || 500;
     const message = error.message || "Something went wrong";
-    res.status(status).json({ status, message });
+    const type = error.type || "Unknown";
+    res.status(status).json({ status, message, type });
   }
 }
 

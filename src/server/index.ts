@@ -1,3 +1,4 @@
+import { ProviderError } from "./../types/errors";
 import express from "express";
 import eulerRoutes from "./routes/euler/";
 import accountRoutes from "./routes/account";
@@ -7,6 +8,7 @@ import ErrorHandler from "../utils/errors";
 import { runJobs } from "../jobs";
 import httpLogger from "../utils/Logging/morgan";
 import { BusinessLogicError } from "../types/errors";
+import { Console } from "winston/lib/winston/transports";
 export const app = express();
 const port = 3000;
 
@@ -18,7 +20,7 @@ app.use("/notifications", notificationRoutes);
 app.use("/lit", litRoutes);
 app.get("/errorHandler", (req, res, next) => {
   try {
-    throw new BusinessLogicError(new Error("Business Logic Error"));
+    throw new ProviderError("THIS IS MY ERROR MESSAGE");
   } catch (e) {
     next(e);
   }

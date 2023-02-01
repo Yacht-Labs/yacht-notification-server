@@ -10,6 +10,7 @@ enum ErrorTypes {
 }
 
 export abstract class YachtError extends Error {
+  public stack: any;
   constructor(error: unknown, public type: ErrorTypes, public status?: number) {
     super(getErrorMessage(error));
     Error.captureStackTrace(this, this.constructor);

@@ -8,41 +8,29 @@ import {
 } from "./../environment";
 import winston, { format } from "winston";
 import CloudWatchTransport from "winston-cloudwatch";
-import { YachtError } from "../../types/errors";
 
-const { combine, timestamp, printf } = format;
+const { combine, errors, prettyPrint } = format;
 
-// const myFormat = printf(({ level, message, timestamp }) => {
-//   return `${timestamp} ${level}: ${message}`;
-// });
-
-const enumerateErrorFormat = format((info: any) => {
-  console.log("info----", info.stack);
-  return info;
-});
-
-const options = {
-  console: {
-    level: "debug",
-    handleExceptions: true,
-    json: true,
-    colorize: true,
-  },
-};
+const formatter = format.combine(
+  format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  format.splat(),
+  format.printf((info) => {
+    const { timestamp, level, message, ...meta } = info;
+    return `${timestamp} [${level}]: ${message} ${
+      Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ""
+    }`;
+  })
+);
 
 const logger = winston.createLogger({
+  format: combine(errors({ stack: true }), formatter),
   levels: winston.config.npm.levels,
-  format: combine(
-    enumerateErrorFormat(),
-    // format.errors({ stack: true }),
-    format.json()
-  ),
-  // timestamp({
-  //   format: "YYYY-MM-DD HH:mm:ss",
-  // }),
-  // myFormat
   transports: [
-    new winston.transports.Console(options.console),
+    new winston.transports.Console({
+      format: prettyPrint({
+        colorize: true,
+      }),
+    }),
     new CloudWatchTransport({
       logGroupName: getAwsLogGroup(),
       logStreamName: getAwsLogStream(),
