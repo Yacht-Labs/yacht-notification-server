@@ -6,6 +6,7 @@ import litRoutes from "./routes/lit/routes";
 import ErrorHandler from "../utils/errors";
 import { runJobs } from "../jobs";
 import httpLogger from "../utils/Logging/morgan";
+import { BusinessLogicError } from "../types/errors";
 export const app = express();
 const port = 3000;
 
@@ -17,7 +18,7 @@ app.use("/notifications", notificationRoutes);
 app.use("/lit", litRoutes);
 app.get("/errorHandler", (req, res, next) => {
   try {
-    throw new Error("Error Handler");
+    throw new BusinessLogicError(new Error("Business Logic Error"));
   } catch (e) {
     next(e);
   }
@@ -27,6 +28,7 @@ app.get("/", (req, res) => {
 });
 app.use(ErrorHandler.logError);
 app.use(ErrorHandler.handleError);
+
 export const server = app.listen(port, async () => {
   console.log(`App listening on port ${port}`);
   await runJobs();
