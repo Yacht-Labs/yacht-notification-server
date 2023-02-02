@@ -46,3 +46,9 @@ export class RequestError extends YachtError {
     super(error, ErrorTypes.REQUEST, 400);
   }
 }
+
+export class HttpError extends YachtError {
+  constructor(error: unknown, status?: number) {
+    super(error, ErrorTypes.REQUEST);
+  }
+}
