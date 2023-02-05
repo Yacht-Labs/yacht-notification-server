@@ -60,7 +60,7 @@ describe("Lit Swap Routes", () => {
   };
 
   describe("/mintSwapPkp", () => {
-    it("should return 200 when passed proper parameters", async () => {
+    it("Should return 200 when passed proper parameters", async () => {
       const prismaLitMockCreate =
         prismaMock.litPkpSwap.create.mockResolvedValueOnce(
           litPkpSwapModelInstance
@@ -77,7 +77,7 @@ describe("Lit Swap Routes", () => {
       expect(response.body.address).toBe("0x1234");
     });
 
-    it("should return 400 when passed improper parameters", async () => {
+    it("Should return 400 when passed improper parameters", async () => {
       const params = {
         chainAParams: {
           counterPartyAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -100,7 +100,7 @@ describe("Lit Swap Routes", () => {
       expect(response.status).toEqual(400);
     });
 
-    it("should return 500 if mintGrantBurn fails", async () => {
+    it("Should return 500 if mintGrantBurn fails", async () => {
       const params = properSwapParams;
       const prismaLitMockCreate =
         prismaMock.litPkpSwap.create.mockResolvedValueOnce(
@@ -118,7 +118,7 @@ describe("Lit Swap Routes", () => {
   });
 
   describe("/runLitAction", () => {
-    it("should return 200 when passed proper parameters", async () => {
+    it("Should return 200 when passed proper parameters", async () => {
       const params = {
         pkpPublicKey: "0x1234",
       };
@@ -137,7 +137,7 @@ describe("Lit Swap Routes", () => {
       expect(response.status).toEqual(200);
     });
 
-    it("should return 400 when passed improper parameters", async () => {
+    it("Should return 400 when passed improper parameters", async () => {
       const response = await request(app)
         .post("/lit/runLitAction")
         .set("Content-Type", "application/json")
@@ -150,7 +150,7 @@ describe("Lit Swap Routes", () => {
       expect(response.status).toEqual(400);
     });
 
-    it("should return 500 if the database fails", async () => {
+    it("Should return 500 if the database fails", async () => {
       prismaMock.litPkpSwap.findUnique.mockRejectedValueOnce(
         new Error("Error")
       );
@@ -166,7 +166,7 @@ describe("Lit Swap Routes", () => {
       expect(response.status).toEqual(500);
     });
 
-    it("should return 500 if runLitAction fails", async () => {
+    it("Should return 500 if runLitAction fails", async () => {
       const params = {
         pkpPublicKey: "0x1234",
       };
@@ -185,7 +185,7 @@ describe("Lit Swap Routes", () => {
   });
 
   describe("/swapObjects/:counterPartyAddress", () => {
-    it("should return 200 when passed proper parameters", async () => {
+    it("Should return 200 when passed proper parameters", async () => {
       const params = {
         counterPartyAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       };
@@ -203,7 +203,7 @@ describe("Lit Swap Routes", () => {
       expect(response.body).toEqual([litPkpSwapModelInstance]);
     });
 
-    it("should return 404 when passed no parameters", async () => {
+    it("Should return 404 when passed no parameters", async () => {
       const response = await request(app)
         .get(`/lit/swapObjects/`)
         .set("Content-Type", "application/json")
@@ -211,7 +211,7 @@ describe("Lit Swap Routes", () => {
       expect(response.status).toEqual(404);
     });
 
-    it("should return 500 if the database fails", async () => {
+    it("Should return 500 if the database fails", async () => {
       const params = {
         counterPartyAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       };
@@ -226,7 +226,7 @@ describe("Lit Swap Routes", () => {
   });
 
   describe("/swapObject", () => {
-    it("should return 200 when passed proper parameters", async () => {
+    it("Should return 200 when passed proper parameters", async () => {
       const params = {
         pkpPublicKey: "0x1234",
       };
@@ -243,7 +243,7 @@ describe("Lit Swap Routes", () => {
       expect(response.body).toEqual(litPkpSwapModelInstance);
     });
 
-    it("should return 500 if the database fails", async () => {
+    it("Should return 500 if the database fails", async () => {
       const params = {
         pkpPublicKey: "0x1234",
       };

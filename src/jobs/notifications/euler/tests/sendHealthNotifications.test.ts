@@ -62,7 +62,7 @@ describe("Euler Health Notifications", () => {
     ]);
   });
 
-  it("should correctly generate a health notification message", async () => {
+  it("Should correctly generate a health notification message", async () => {
     let mockHealthScore = 2.0;
     const message = eulerNotificationService.generateHealthNotification(
       mockHealthScore,

@@ -9,6 +9,7 @@ import { runJobs } from "../jobs";
 import httpLogger from "../utils/Logging/morgan";
 import { BusinessLogicError } from "../types/errors";
 import { Console } from "winston/lib/winston/transports";
+import logger from "../utils/Logging/logger";
 export const app = express();
 const port = 3000;
 
@@ -32,6 +33,6 @@ app.use(ErrorHandler.logError);
 app.use(ErrorHandler.handleError);
 
 export const server = app.listen(port, async () => {
-  console.info(`App listening on port ${port}`);
+  logger.info(`App listening on port ${port}`);
   await runJobs();
 });

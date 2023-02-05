@@ -7,30 +7,9 @@ import { AppleNotificationSender } from "../../../notifications/AppleNotificatio
 export const sendIRNotifications = async () => {
   try {
     console.info("...Sending IR Notifications...");
-    const notifications = await db.eulerIRNotification.findMany({
-      where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
-    });
     const appleNotificationSender = new AppleNotificationSender();
     const notifier = new EulerNotificationService(appleNotificationSender);
-    for (const notification of notifications) {
-      const eulerToken = await db.eulerToken.findFirstOrThrow({
-        where: { address: notification.tokenAddress },
-        include: {
-          token: {
-            select: {
-              symbol: true,
-            },
-          },
-        },
-      });
-      const { borrowAPY, supplyAPY } = eulerToken;
-      notifier.processIRNotification(
-        borrowAPY,
-        supplyAPY,
-        eulerToken.token.symbol,
-        notification
-      );
-    }
+    await notifier.sendIRNotifications();
     console.info("...Finished sending IR notifications...\n");
   } catch (databaseError) {
     logger.error(databaseError);
