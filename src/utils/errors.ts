@@ -20,6 +20,9 @@ export default class ErrorHandler {
     const message = error.message || "Something went wrong";
     const type = error.type || "Unknown";
     res.status(status).json({ status, message, type });
+    if (!error.isTrusted) {
+      process.exit();
+    }
   }
 }
 

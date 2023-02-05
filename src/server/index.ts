@@ -32,6 +32,6 @@ app.use(ErrorHandler.logError);
 app.use(ErrorHandler.handleError);
 
 export const server = app.listen(port, async () => {
-  console.log(`App listening on port ${port}`);
+  console.info(`App listening on port ${port}`);
   await runJobs();
 });

@@ -28,7 +28,7 @@ export class NotificationService {
     notificationId: string,
     notificationType: NotificationType
   ): Promise<boolean> {
-    console.log("Sending notification");
+    logger.info("Sending notification");
     const note = new apn.Notification();
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
     note.alert = message;

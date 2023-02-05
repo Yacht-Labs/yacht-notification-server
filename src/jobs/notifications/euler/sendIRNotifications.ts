@@ -6,7 +6,7 @@ import { AppleNotificationSender } from "../../../notifications/AppleNotificatio
 
 export const sendIRNotifications = async () => {
   try {
-    console.log("...Sending IR Notifications...");
+    console.info("...Sending IR Notifications...");
     const notifications = await db.eulerIRNotification.findMany({
       where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
     });
@@ -31,7 +31,7 @@ export const sendIRNotifications = async () => {
         notification
       );
     }
-    console.log("...Finished sending IR notifications...\n");
+    console.info("...Finished sending IR notifications...\n");
   } catch (databaseError) {
     logger.error(databaseError);
   }

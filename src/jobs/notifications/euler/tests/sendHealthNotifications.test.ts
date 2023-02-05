@@ -1,5 +1,11 @@
+import {
+  BusinessLogicError,
+  DatabaseError,
+  NotificationError,
+  ProviderError,
+} from "./../../../../types/errors";
 import { prismaMock } from "../../../../../test/singleton";
-import { Prisma } from "@prisma/client";
+import { prisma, Prisma } from "@prisma/client";
 import { EulerNotificationService } from "../../../../notifications/euler/EulerNotificationService";
 import {
   EulerHealthNotificationWithAccount,
@@ -7,7 +13,9 @@ import {
 } from "../../../../types";
 import { AppleNotificationSender } from "../../../../notifications/AppleNotificationSender";
 import { EulerService } from "../../../../services/EulerService";
+import logger from "../../../../utils/Logging/logger";
 
+// mock Apple Notification Sender
 const mockSendNotification = jest.fn().mockResolvedValue(true);
 jest.mock("../../../../notifications/AppleNotificationSender", () => {
   return {
@@ -22,28 +30,6 @@ jest.mock("../../../../notifications/AppleNotificationSender", () => {
 // mock EulerService
 const mockGetHealthScore = jest.fn();
 const mockGetSubAccountAddressFromAccount = jest.fn();
-
-// jest.mock("../../../../services/EulerService", () => {
-//   return {
-//     EulerService: jest.fn().mockImplementation(() => {
-//       return {
-//         getHealthScore: (...args: any[]) => mockGetHealthScore(...args),
-//         getSubAccountAddressFromAccount: () =>
-//           mockGetSubAccountAddressFromAccount(),
-//       };
-//     }),
-//   };
-// });
-
-// jest.mock("../../../../services/EulerService", () => {
-//   return {
-//     EulerService: {
-//       getHealthScore: (...args: any[]) => mockGetHealthScore(...args),
-//       getSubAccountAddressFromAccount: () =>
-//         mockGetSubAccountAddressFromAccount(),
-//     },
-//   };
-// });
 
 describe("Euler Health Notifications", () => {
   const eulerNotificationService = new EulerNotificationService(
@@ -71,7 +57,7 @@ describe("Euler Health Notifications", () => {
     prismaMock.eulerHealthNotification.update.mockResolvedValue(
       mockHealthNotification
     );
-    prismaMock.eulerHealthNotification.findMany.mockResolvedValueOnce([
+    prismaMock.eulerHealthNotification.findMany.mockResolvedValue([
       mockHealthNotification,
     ]);
   });
@@ -114,5 +100,90 @@ describe("Euler Health Notifications", () => {
       NotificationType.EulerHealthScore
     );
     expect(prismaMock.eulerHealthNotification.update).toHaveBeenCalledTimes(1);
+  });
+
+  it("Should not send a health notification if healthscore >= threshold", async () => {
+    let mockHealthScore = 3.0;
+    mockGetHealthScore.mockResolvedValue(mockHealthScore);
+    mockGetSubAccountAddressFromAccount.mockReturnValue(
+      "0x38c3A84293F9079DEC28573cD3f1E8a995b0B500"
+    );
+    EulerService.getHealthScoreByAddress = mockGetHealthScore;
+    EulerService.getSubAccountAddressFromAccount =
+      mockGetSubAccountAddressFromAccount;
+
+    await eulerNotificationService.sendHealthNotifications();
+
+    expect(mockSendNotification).toHaveBeenCalledTimes(0);
+    expect(prismaMock.eulerHealthNotification.update).toHaveBeenCalledTimes(0);
+
+    // check equality on threshold and notification healthscore
+    mockHealthScore = mockHealthNotification.thresholdValue;
+    mockGetHealthScore.mockResolvedValue(mockHealthScore);
+    mockGetSubAccountAddressFromAccount.mockReturnValue(
+      "0x38c3A84293F9079DEC28573cD3f1E8a995b0B500"
+    );
+    EulerService.getHealthScoreByAddress = mockGetHealthScore;
+    EulerService.getSubAccountAddressFromAccount =
+      mockGetSubAccountAddressFromAccount;
+
+    await eulerNotificationService.sendHealthNotifications();
+
+    expect(mockSendNotification).toHaveBeenCalledTimes(0);
+    expect(prismaMock.eulerHealthNotification.update).toHaveBeenCalledTimes(0);
+  });
+
+  it("Should log errors from database", async () => {
+    prismaMock.eulerHealthNotification.findMany.mockRejectedValue(
+      new Error("test database error")
+    );
+    EulerService.getHealthScoreByAddress = mockGetHealthScore;
+    EulerService.getSubAccountAddressFromAccount =
+      mockGetSubAccountAddressFromAccount;
+    const mockLoggerError = jest.spyOn(logger, "error");
+    await eulerNotificationService.sendHealthNotifications();
+
+    expect(mockLoggerError).toHaveBeenCalledTimes(1);
+    expect(mockLoggerError).toHaveBeenCalledWith(
+      new DatabaseError(new Error("test database error"))
+    );
+  });
+
+  it("Should log errors from EulerService", async () => {
+    jest
+      .spyOn(EulerService, "getHealthScoreByAddress")
+      .mockRejectedValueOnce(new ProviderError("test provider error"));
+    const mockLoggerError = jest.spyOn(logger, "error");
+    await eulerNotificationService.sendHealthNotifications();
+
+    expect(mockLoggerError).toHaveBeenCalledTimes(1);
+    expect(mockLoggerError).toHaveBeenCalledWith(
+      new ProviderError("test provider error")
+    );
+
+    jest
+      .spyOn(EulerService, "getSubAccountAddressFromAccount")
+      .mockImplementationOnce(() => {
+        throw new BusinessLogicError("test error");
+      });
+    await eulerNotificationService.sendHealthNotifications();
+
+    expect(mockLoggerError).toHaveBeenCalledTimes(2);
+    expect(mockLoggerError).toHaveBeenLastCalledWith(
+      new BusinessLogicError("test error")
+    );
+
+    mockSendNotification.mockImplementationOnce(() => {
+      throw new NotificationError("test notification error");
+    });
+    eulerNotificationService.generateHealthNotification = jest
+      .fn()
+      .mockReturnValue("test message");
+    await eulerNotificationService.sendHealthNotifications();
+
+    expect(mockLoggerError).toHaveBeenCalledTimes(3);
+    expect(mockLoggerError).toHaveBeenLastCalledWith(
+      new NotificationError("test notification error")
+    );
   });
 });

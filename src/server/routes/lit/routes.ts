@@ -3,6 +3,7 @@ import litSdk from "./sdk";
 import { create } from "ipfs-core";
 import db from "../../../../prisma/db";
 import { BigNumber } from "ethers";
+import logger from "../../../utils/Logging/logger";
 type LitERC20SwapParam = {
   counterPartyAddress: string;
   tokenAddress: string;
@@ -73,13 +74,13 @@ router.post("/mintSwapPkp", async (req, res) => {
       });
       return res.json({ ipfsCID, ...pkpInfo, pkpPublicKey: pkpInfo.publicKey });
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       return res.sendStatus(500);
     } finally {
       await ipfs.stop();
     }
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.sendStatus(500);
   }
 });
@@ -119,13 +120,12 @@ router.post("/runLitAction", async (req, res) => {
         chainAGasConfig,
         chainBGasConfig,
       });
-      console.log(litActionCodeResponse);
       return res.json(litActionCodeResponse);
     } else {
       res.status(400).send("Invalid PKP public key");
     }
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.sendStatus(500);
   }
 });
@@ -158,7 +158,7 @@ router.get("/swapObjects/:counterPartyAddress", async (req, res) => {
     });
     return res.json(litPkpSwaps);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.sendStatus(500);
   }
 });
@@ -172,7 +172,7 @@ router.get("/swapObject/:pkpPublicKey", async (req, res) => {
     });
     return res.json(litPkpSwap);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.sendStatus(500);
   }
 });
