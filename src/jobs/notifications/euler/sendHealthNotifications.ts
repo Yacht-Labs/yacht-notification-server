@@ -1,35 +1,14 @@
-import db from "../../../../prisma/db";
-import { EulerService } from "../../../services/EulerService";
 import { EulerNotificationService } from "../../../notifications/euler/EulerNotificationService";
 import logger from "../../../utils/Logging/logger";
-import { getSubAccountAddressFromAccount } from "../../../utils";
+import { AppleNotificationSender } from "../../../notifications/AppleNotificationSender";
 
 export const sendHealthNotifications = async () => {
   try {
-    console.log("...Sending health notifications...");
-    const healthNotifications = await db.eulerHealthNotification.findMany({
-      where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
-      include: {
-        account: {
-          select: {
-            address: true,
-            deviceId: true,
-            name: true,
-          },
-        },
-      },
-    });
-    const notifier = new EulerNotificationService();
-    for (const notification of healthNotifications) {
-      const healthScore = await EulerService.getHealthScoreByAddress(
-        getSubAccountAddressFromAccount(
-          notification.account.address,
-          notification.subAccountId
-        )
-      );
-      notifier.processHealthNotification(healthScore, notification);
-    }
-    console.log("...Finished sending health notifications...\n");
+    console.log("...Sending Euler health notifications...\n");
+    const appleNotificationSender = new AppleNotificationSender();
+    const notifier = new EulerNotificationService(appleNotificationSender);
+    await notifier.sendHealthNotifications();
+    console.log("...Finished sending Euler health notifications...\n");
   } catch (err) {
     logger.error(err);
   }

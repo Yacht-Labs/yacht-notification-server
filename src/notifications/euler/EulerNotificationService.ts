@@ -1,9 +1,6 @@
+import { sendHealthNotifications } from "./../../jobs/notifications/euler/sendHealthNotifications";
 import { NotificationService } from "../apn";
-import {
-  EulerHealthNotification,
-  Account,
-  EulerIRNotification,
-} from "@prisma/client";
+import { EulerHealthNotification, EulerIRNotification } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import db from "../../../prisma/db";
 import logger from "../../utils/Logging/logger";
@@ -11,6 +8,8 @@ import {
   EulerHealthNotificationWithAccount,
   NotificationType,
 } from "../../types";
+import { AppleNotificationSender } from "../AppleNotificationSender";
+import { EulerService } from "../../services/EulerService";
 
 enum IRNotificationType {
   BORROW = "Borrow",
@@ -18,8 +17,7 @@ enum IRNotificationType {
 }
 
 export class EulerNotificationService {
-  notificationService = new NotificationService();
-  constructor() {}
+  constructor(public appleNotificationSender: AppleNotificationSender) {}
 
   buildIRNotification(
     notificationAPY: number | null,
@@ -61,7 +59,7 @@ export class EulerNotificationService {
       IRNotificationType.BORROW
     );
     if (borrowNotification) {
-      const success = await this.notificationService.sendNotification(
+      const success = await this.appleNotificationSender.sendNotification(
         borrowNotification,
         notification.deviceId,
         notification.id,
@@ -85,7 +83,7 @@ export class EulerNotificationService {
       IRNotificationType.SUPPLY
     );
     if (supplyNotification) {
-      const success = await this.notificationService.sendNotification(
+      const success = await this.appleNotificationSender.sendNotification(
         supplyNotification,
         notification.deviceId,
         notification.id,
@@ -102,42 +100,84 @@ export class EulerNotificationService {
     }
   }
 
-  async processHealthNotification(
+  async getHealthNotifications(): Promise<
+    (EulerHealthNotification & {
+      account: {
+        deviceId: string;
+        address: string;
+        name: string | null;
+      };
+    })[]
+  > {
+    return await db.eulerHealthNotification.findMany({
+      where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
+      include: {
+        account: {
+          select: {
+            address: true,
+            deviceId: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+
+  async sendHealthNotifications() {
+    try {
+      const healthNotifications = await this.getHealthNotifications();
+      for (const notification of healthNotifications) {
+        const healthScore = await EulerService.getHealthScoreByAddress(
+          EulerService.getSubAccountAddressFromAccount(
+            notification.account.address,
+            notification.subAccountId
+          )
+        );
+        const message = this.generateHealthNotification(
+          healthScore,
+          notification
+        );
+        if (message) {
+          const success = await this.appleNotificationSender.sendNotification(
+            message,
+            notification.deviceId,
+            notification.id,
+            NotificationType.EulerHealthScore
+          );
+          if (success) {
+            await db.eulerHealthNotification.update({
+              where: { id: notification.id },
+              data: { seen: true },
+            });
+          }
+        }
+      }
+    } catch (err) {
+      logger.error(err);
+    }
+  }
+
+  generateHealthNotification(
     healthScore: number,
     healthNotification: Prisma.EulerHealthNotificationGetPayload<
       typeof EulerHealthNotificationWithAccount
     >
-  ) {
+  ): string | undefined {
     if (
       healthNotification.thresholdValue > healthScore &&
       !healthNotification.seen
     ) {
-      try {
-        const message = `Euler health score for ${
-          healthNotification.account.name
-        }, subAccountId ${
-          healthNotification.subAccountId
-        } has dropped below ${healthNotification.thresholdValue
-          .toString()
-          .slice(
-            0,
-            healthNotification.thresholdValue.toString().indexOf(".") + 2
-          )}!`;
-        const success = await this.notificationService.sendNotification(
-          message,
-          healthNotification.deviceId,
-          healthNotification.id,
-          NotificationType.EulerHealthScore
-        );
-        if (success) {
-          await db.eulerHealthNotification.update({
-            where: { id: healthNotification.id },
-            data: { seen: true },
-          });
-        }
-      } catch (err) {
-        logger.error(`Error sending Euler health notification: ${err}`);
-      }
+      const message = `Euler health score for ${
+        healthNotification.account.name
+      }, subAccountId ${
+        healthNotification.subAccountId
+      } has dropped below ${healthNotification.thresholdValue
+        .toString()
+        .slice(
+          0,
+          healthNotification.thresholdValue.toString().indexOf(".") + 2
+        )}!`;
+      return message;
     }
   }
 }

@@ -1,6 +1,8 @@
 import { EulerNotificationService } from "./../../../notifications/euler/EulerNotificationService";
 import db from "../../../../prisma/db";
 import logger from "../../../utils/Logging/logger";
+import { NotificationService } from "../../../notifications/apn";
+import { AppleNotificationSender } from "../../../notifications/AppleNotificationSender";
 
 export const sendIRNotifications = async () => {
   try {
@@ -8,7 +10,8 @@ export const sendIRNotifications = async () => {
     const notifications = await db.eulerIRNotification.findMany({
       where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
     });
-    const notifier = new EulerNotificationService();
+    const appleNotificationSender = new AppleNotificationSender();
+    const notifier = new EulerNotificationService(appleNotificationSender);
     for (const notification of notifications) {
       const eulerToken = await db.eulerToken.findFirstOrThrow({
         where: { address: notification.tokenAddress },
