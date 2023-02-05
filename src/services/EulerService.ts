@@ -1,6 +1,7 @@
+import { isEvmAddress } from "./../utils/evm";
 import { getEulerTokenEndpoint } from "./../utils/environment";
 import { DatabaseError, HttpError, ProviderError } from "./../types/errors";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, utils } from "ethers";
 import {
   getEulerGraphEndpoint,
   getEulerSimpleLens,
@@ -255,9 +256,7 @@ export class EulerService {
     address: string
   ): Promise<number> {
     try {
-      const provider = new ethers.providers.JsonRpcProvider(
-        getProviderUrl(1) // mainnet
-      );
+      const provider = new ethers.providers.JsonRpcProvider(getProviderUrl(1));
       const eulerLens = new ethers.Contract(
         getEulerSimpleLens(),
         eulerLensContract.abi,
@@ -267,7 +266,20 @@ export class EulerService {
         await eulerLens.getAccountStatus(address);
       return parseFloat(ethers.utils.formatEther(healthScore));
     } catch (err) {
-      throw new ProviderError(getErrorMessage(err));
+      throw new ProviderError(err);
     }
+  }
+
+  public static getSubAccountAddressFromAccount(
+    primary: string,
+    subAccountId: string
+  ) {
+    if (isEvmAddress(primary)) {
+      return utils.hexZeroPad(
+        BigNumber.from(primary).xor(subAccountId).toHexString(),
+        20
+      );
+    }
+    throw new Error(`Invalid primary address: ${primary}`);
   }
 }

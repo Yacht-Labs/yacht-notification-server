@@ -1,100 +1,118 @@
-import { sendHealthNotifications } from "../sendHealthNotifications";
 import { prismaMock } from "../../../../../test/singleton";
-import { EulerHealthNotification } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { EulerNotificationService } from "../../../../notifications/euler/EulerNotificationService";
+import {
+  EulerHealthNotificationWithAccount,
+  NotificationType,
+} from "../../../../types";
+import { AppleNotificationSender } from "../../../../notifications/AppleNotificationSender";
 import { EulerService } from "../../../../services/EulerService";
-import { getSubAccountAddressFromAccount } from "../../../../utils";
 
 const mockSendNotification = jest.fn().mockResolvedValue(true);
-jest.mock("../../../../notifications/apn", () => {
+jest.mock("../../../../notifications/AppleNotificationSender", () => {
   return {
-    NotificationService: jest.fn().mockImplementation(() => {
+    AppleNotificationSender: jest.fn().mockImplementation(() => {
       return {
-        sendNotification: () => mockSendNotification(),
+        sendNotification: (...args: any[]) => mockSendNotification(...args),
       };
     }),
   };
 });
 
-jest.mock("../../../../utils", () => ({
-  getSubAccountAddressFromAccount: jest.fn(),
-}));
+// mock EulerService
+const mockGetHealthScore = jest.fn();
+const mockGetSubAccountAddressFromAccount = jest.fn();
 
-const ACCOUNT_ID = "100";
-const DEVICE_ID = "100";
-const ADDRESS = "100";
+// jest.mock("../../../../services/EulerService", () => {
+//   return {
+//     EulerService: jest.fn().mockImplementation(() => {
+//       return {
+//         getHealthScore: (...args: any[]) => mockGetHealthScore(...args),
+//         getSubAccountAddressFromAccount: () =>
+//           mockGetSubAccountAddressFromAccount(),
+//       };
+//     }),
+//   };
+// });
 
-function mockFindHealthNotifications(
-  healthNotification: EulerHealthNotification,
-  ...args: EulerHealthNotification[]
-) {
-  return prismaMock.eulerHealthNotification.findMany.mockResolvedValueOnce([
-    healthNotification,
-    ...args,
-  ]);
-}
+// jest.mock("../../../../services/EulerService", () => {
+//   return {
+//     EulerService: {
+//       getHealthScore: (...args: any[]) => mockGetHealthScore(...args),
+//       getSubAccountAddressFromAccount: () =>
+//         mockGetSubAccountAddressFromAccount(),
+//     },
+//   };
+// });
 
-function mockUpdateNotification(
-  healthNotification: EulerHealthNotification,
-  seen: boolean
-) {
-  return prismaMock.eulerHealthNotification.update.mockResolvedValueOnce({
-    ...healthNotification,
-    seen,
+describe("Euler Health Notifications", () => {
+  const eulerNotificationService = new EulerNotificationService(
+    new AppleNotificationSender()
+  );
+  const mockHealthNotification = {
+    id: "1",
+    thresholdValue: 2.5756,
+    isActive: true,
+    account: {
+      name: "test",
+    },
+    accountId: "100",
+    deviceId: "100",
+    seen: false,
+    subAccountId: "100",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  } as Prisma.EulerHealthNotificationGetPayload<
+    typeof EulerHealthNotificationWithAccount
+  >;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    prismaMock.eulerHealthNotification.update.mockResolvedValue(
+      mockHealthNotification
+    );
+    prismaMock.eulerHealthNotification.findMany.mockResolvedValueOnce([
+      mockHealthNotification,
+    ]);
   });
-}
 
-describe("Euler Notifications", () => {
-  describe("Health Notifications", () => {
-    const baseHealthNotification = {
-      id: "1",
-      thresholdValue: 2.5,
-      isActive: true,
-      accountId: ACCOUNT_ID,
-      deviceId: DEVICE_ID,
-      seen: false,
-      subAccountId: "main",
-      account: {
-        address: ADDRESS,
-        deviceId: DEVICE_ID,
-        name: "healthNotification1",
-      },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as EulerHealthNotification;
+  it("should correctly generate a health notification message", async () => {
+    let mockHealthScore = 2.0;
+    const message = eulerNotificationService.generateHealthNotification(
+      mockHealthScore,
+      mockHealthNotification
+    );
+    expect(message).toBe(
+      `Euler health score for ${mockHealthNotification.account.name}, subAccountId ${mockHealthNotification.subAccountId} has dropped below 2.5!`
+    );
 
-    beforeEach(() => {
-      EulerService.getHealthScoreByAddress = jest.fn().mockResolvedValue(2);
-    });
+    mockHealthScore = 3.0;
+    const message2 = eulerNotificationService.generateHealthNotification(
+      mockHealthScore,
+      mockHealthNotification
+    );
+    expect(message2).toBe(undefined);
+  });
 
-    test("Should send a notification when healthscore < threshold", async () => {
-      mockFindHealthNotifications(baseHealthNotification);
-      const updateMock = mockUpdateNotification(baseHealthNotification, true);
-      await sendHealthNotifications();
-      expect(mockSendNotification).toHaveBeenCalledTimes(1);
-      // TODO - fix this test
-      // expect(updateMock).toHaveBeenCalledTimes(1);
-    });
+  it("Should send a health notification if healthscore < threshold", async () => {
+    let mockHealthScore = 2.0;
+    mockGetHealthScore.mockResolvedValue(mockHealthScore);
+    mockGetSubAccountAddressFromAccount.mockReturnValue(
+      "0x38c3A84293F9079DEC28573cD3f1E8a995b0B500"
+    );
+    EulerService.getHealthScoreByAddress = mockGetHealthScore;
+    EulerService.getSubAccountAddressFromAccount =
+      mockGetSubAccountAddressFromAccount;
 
-    test("Should not send a notification when healthscore > threshold", async () => {
-      mockFindHealthNotifications({
-        ...baseHealthNotification,
-        thresholdValue: 1,
-      });
-      const updateMock = mockUpdateNotification(baseHealthNotification, false);
-      await sendHealthNotifications();
-      expect(mockSendNotification).toHaveBeenCalledTimes(0);
-      expect(updateMock).toHaveBeenCalledTimes(0);
-    });
+    await eulerNotificationService.sendHealthNotifications();
 
-    test("Should not send a notification when healthscore < threshold but has been seen", async () => {
-      mockFindHealthNotifications({
-        ...baseHealthNotification,
-        seen: true,
-      });
-      const updateMock = mockUpdateNotification(baseHealthNotification, true);
-      await sendHealthNotifications();
-      expect(mockSendNotification).toHaveBeenCalledTimes(0);
-      expect(updateMock).toHaveBeenCalledTimes(0);
-    });
+    expect(mockSendNotification).toHaveBeenCalledTimes(1);
+    expect(mockSendNotification).toHaveBeenCalledWith(
+      `Euler health score for ${mockHealthNotification.account.name}, subAccountId ${mockHealthNotification.subAccountId} has dropped below 2.5!`,
+      mockHealthNotification.deviceId,
+      mockHealthNotification.id,
+      NotificationType.EulerHealthScore
+    );
+    expect(prismaMock.eulerHealthNotification.update).toHaveBeenCalledTimes(1);
   });
 });
