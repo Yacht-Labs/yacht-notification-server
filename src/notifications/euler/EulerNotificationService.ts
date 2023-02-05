@@ -1,6 +1,4 @@
 import { DatabaseError } from "./../../types/errors";
-import { sendHealthNotifications } from "./../../jobs/notifications/euler/sendHealthNotifications";
-import { NotificationService } from "../apn";
 import { EulerHealthNotification, EulerIRNotification } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import db from "../../../prisma/db";
@@ -12,92 +10,109 @@ import {
 import { AppleNotificationSender } from "../AppleNotificationSender";
 import { EulerService } from "../../services/EulerService";
 
-enum IRNotificationType {
+export enum IRNotificationType {
   BORROW = "Borrow",
   SUPPLY = "Supply",
 }
 
+export type IRNotificationParams = {
+  notificationAPY: number | null;
+  realAPY: number;
+  lowerThreshold: number;
+  upperThreshold: number;
+  symbol: string;
+  type: string;
+};
+
 export class EulerNotificationService {
   constructor(public appleNotificationSender: AppleNotificationSender) {}
 
-  buildIRNotification(
-    notificationAPY: number | null,
-    realAPY: number,
-    lowerThreshold: number,
-    upperThreshold: number,
-    symbol: string,
-    type: string
-  ): string {
+  async getIrNotifications(): Promise<EulerIRNotification[]> {
+    try {
+      return await db.eulerIRNotification.findMany({
+        where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
+      });
+    } catch (err) {
+      throw new DatabaseError(err);
+    }
+  }
+
+  buildIRNotification(params: IRNotificationParams): string {
     let notificationText = "";
-    if (!notificationAPY) {
+    if (!params.notificationAPY) {
       return notificationText;
     }
-    if (lowerThreshold) {
-      if (realAPY <= notificationAPY * (1 - lowerThreshold / 100)) {
-        notificationText = `The Euler ${type}APY on ${symbol} is now ${realAPY}%`;
+    if (params.lowerThreshold) {
+      if (
+        params.realAPY <=
+        params.notificationAPY * (1 - params.lowerThreshold / 100)
+      ) {
+        notificationText = `The Euler ${params.type}APY on ${params.symbol} is now ${params.realAPY}%`;
       }
     }
-    if (upperThreshold) {
-      if (realAPY >= notificationAPY * (1 + upperThreshold / 100)) {
-        notificationText = `The Euler ${type}APY on ${symbol} is now ${realAPY}%`;
+    if (params.upperThreshold) {
+      if (
+        params.realAPY >=
+        params.notificationAPY * (1 + params.upperThreshold / 100)
+      ) {
+        notificationText = `The Euler ${params.type}APY on ${params.symbol} is now ${params.realAPY}%`;
       }
     }
     return notificationText;
   }
 
-  async processIRNotification(
-    borrowAPY: number,
-    supplyAPY: number,
-    symbol: string,
-    notification: EulerIRNotification
-  ) {
-    const borrowNotification = this.buildIRNotification(
-      notification.borrowAPY,
-      borrowAPY,
-      notification.borrowLowerThreshold,
-      notification.borrowUpperThreshold,
-      symbol,
-      IRNotificationType.BORROW
-    );
-    if (borrowNotification) {
-      const success = await this.appleNotificationSender.sendNotification(
-        borrowNotification,
-        notification.deviceId,
-        notification.id,
-        NotificationType.EulerIR
-      );
-      if (success) {
-        await db.eulerIRNotification.update({
-          where: { id: notification.id },
-          data: {
-            borrowAPY,
+  async sendIRNotifications() {
+    try {
+      const irNotifications = await this.getIrNotifications();
+      for (const notification of irNotifications) {
+        const eulerToken = await db.eulerToken.findFirstOrThrow({
+          where: { address: notification.tokenAddress },
+          include: {
+            token: {
+              select: {
+                symbol: true,
+              },
+            },
           },
         });
-      }
-    }
-    const supplyNotification = this.buildIRNotification(
-      notification.supplyAPY,
-      supplyAPY,
-      notification.supplyLowerThreshold,
-      notification.supplyUpperThreshold,
-      symbol,
-      IRNotificationType.SUPPLY
-    );
-    if (supplyNotification) {
-      const success = await this.appleNotificationSender.sendNotification(
-        supplyNotification,
-        notification.deviceId,
-        notification.id,
-        NotificationType.EulerIR
-      );
-      if (success) {
-        await db.eulerIRNotification.update({
-          where: { id: notification.id },
-          data: {
-            supplyAPY,
-          },
+        const { borrowAPY, supplyAPY } = eulerToken;
+        const borrowMessage = this.buildIRNotification({
+          notificationAPY: notification.borrowAPY,
+          realAPY: borrowAPY,
+          lowerThreshold: notification.borrowLowerThreshold,
+          upperThreshold: notification.borrowUpperThreshold,
+          symbol: eulerToken.token.symbol,
+          type: IRNotificationType.BORROW,
         });
+        const supplyMessage = this.buildIRNotification({
+          notificationAPY: notification.supplyAPY,
+          realAPY: supplyAPY,
+          lowerThreshold: notification.supplyLowerThreshold,
+          upperThreshold: notification.supplyUpperThreshold,
+          symbol: eulerToken.token.symbol,
+          type: IRNotificationType.SUPPLY,
+        });
+        const message = borrowMessage || supplyMessage;
+        if (message) {
+          const success = await this.appleNotificationSender.sendNotification(
+            message,
+            notification.deviceId,
+            notification.id,
+            NotificationType.EulerIR
+          );
+          if (success) {
+            await db.eulerIRNotification.update({
+              where: { id: notification.id },
+              data: {
+                borrowAPY: borrowMessage ? borrowAPY : notification.borrowAPY,
+                supplyAPY: supplyMessage ? supplyAPY : notification.supplyAPY,
+              },
+            });
+          }
+        }
       }
+    } catch (err) {
+      logger.error(err);
     }
   }
 

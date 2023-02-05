@@ -2,7 +2,7 @@ import { isEvmAddress } from "../evm";
 
 describe("Utils", () => {
   describe("EVM", () => {
-    it("should return true if address is valid", () => {
+    it("Should return true if address is valid", () => {
       expect(isEvmAddress("0x0000000000000000000000000000000000000000")).toBe(
         true
       );
@@ -11,7 +11,7 @@ describe("Utils", () => {
       );
     });
 
-    it("should return false if address is invalid", () => {
+    it("Should return false if address is invalid", () => {
       expect(isEvmAddress("0x000000000000000000000000000000000000000")).toBe(
         false
       );
