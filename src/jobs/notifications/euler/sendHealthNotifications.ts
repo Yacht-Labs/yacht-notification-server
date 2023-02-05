@@ -4,11 +4,11 @@ import { AppleNotificationSender } from "../../../notifications/AppleNotificatio
 
 export const sendHealthNotifications = async () => {
   try {
-    console.log("...Sending Euler health notifications...\n");
+    logger.info("...Sending Euler health notifications...\n");
     const appleNotificationSender = new AppleNotificationSender();
     const notifier = new EulerNotificationService(appleNotificationSender);
     await notifier.sendHealthNotifications();
-    console.log("...Finished sending Euler health notifications...\n");
+    logger.info("...Finished sending Euler health notifications...\n");
   } catch (err) {
     logger.error(err);
   }

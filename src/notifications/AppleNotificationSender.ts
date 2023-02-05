@@ -9,6 +9,7 @@ import apn from "apn";
 import logger from "../utils/Logging/logger";
 import { NotificationType } from "../types";
 import db from "../../prisma/db";
+import { NotificationError } from "../types/errors";
 
 export class AppleNotificationSender implements NotificationSender {
   private provider: apn.Provider;
@@ -28,7 +29,7 @@ export class AppleNotificationSender implements NotificationSender {
     notificationId: string,
     notificationType: NotificationType
   ): Promise<boolean> {
-    console.log("Sending notification");
+    console.info("Sending notification");
     const note = new apn.Notification();
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
     note.alert = message;
@@ -51,8 +52,7 @@ export class AppleNotificationSender implements NotificationSender {
       }
       return res.sent[0] ? true : false;
     } catch (err) {
-      logger.error(err);
-      return false;
+      throw new NotificationError(err);
     }
   }
 }

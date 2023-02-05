@@ -30,6 +30,7 @@ const logger = winston.createLogger({
       format: prettyPrint({
         colorize: true,
       }),
+      silent: process.env.NODE_ENV === "test",
     }),
     new CloudWatchTransport({
       logGroupName: getAwsLogGroup(),

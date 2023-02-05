@@ -1,6 +1,11 @@
 import { isEvmAddress } from "./../utils/evm";
 import { getEulerTokenEndpoint } from "./../utils/environment";
-import { DatabaseError, HttpError, ProviderError } from "./../types/errors";
+import {
+  BusinessLogicError,
+  DatabaseError,
+  HttpError,
+  ProviderError,
+} from "./../types/errors";
 import { BigNumber, ethers, utils } from "ethers";
 import {
   getEulerGraphEndpoint,
@@ -54,7 +59,7 @@ export class EulerService {
     };
 
     try {
-      console.log("...Updating Euler tokens...");
+      logger.info("...Updating Euler tokens...");
       const response = await fetch(getEulerTokenEndpoint());
       const { tokens }: { tokens: TokenInfo[] } = await response.json();
       if (!tokens) return;
@@ -100,7 +105,7 @@ export class EulerService {
           }
         }
       }
-      console.log("...Finished updating Euler tokens\n");
+      logger.info("...Finished updating Euler tokens\n");
     } catch (err) {
       logger.error(new HttpError(`Error updating Euler tokens: ${err}`));
     }
@@ -149,7 +154,7 @@ export class EulerService {
       }
       return true;
     };
-    console.log("...Updating Euler Tokens With Euler Data...");
+    logger.info("...Updating Euler Tokens With Euler Data...");
     const tokenQuery = gql`
       query {
         assets {
@@ -172,10 +177,8 @@ export class EulerService {
         getEulerGraphEndpoint(),
         tokenQuery
       );
-      console.log({ assets });
       if (!assets) return;
       for (const asset of assets) {
-        console.log({ asset });
         if (!isAssetSafe(asset)) continue;
         const price = new BigNumberJs(asset.currPriceUsd)
           .dividedBy(new BigNumberJs("10e17"))
@@ -209,7 +212,6 @@ export class EulerService {
           eulAPY: 0.0,
         };
         try {
-          console.log("----HERE----");
           const tokenExists = await db.token.findFirst({
             where: {
               address: asset.id,
@@ -246,7 +248,7 @@ export class EulerService {
           logger.error(`Database error: ${err}`);
         }
       }
-      console.log("...Finished updating Euler tokens with Euler Data...\n");
+      logger.info("...Finished updating Euler tokens with Euler Data...\n");
     } catch (err) {
       logger.error(`Euler graph error: ${err}`);
     }
@@ -280,6 +282,6 @@ export class EulerService {
         20
       );
     }
-    throw new Error(`Invalid primary address: ${primary}`);
+    throw new BusinessLogicError(`Invalid primary address: ${primary}`);
   }
 }

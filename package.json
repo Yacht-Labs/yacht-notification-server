@@ -7,7 +7,7 @@
     "node": "^16.0.0"
   },
   "scripts": {
-    "test": "jest -i",
+    "test": "jest -i --detectOpenHandles --forceExit",
     "build": "tsc",
     "db-fix": "npm run db-reset && npm run db-deploy",
     "start": "tsc && node ./out/src/server/index.js",

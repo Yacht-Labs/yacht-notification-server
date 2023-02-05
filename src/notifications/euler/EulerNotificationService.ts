@@ -1,3 +1,4 @@
+import { DatabaseError } from "./../../types/errors";
 import { sendHealthNotifications } from "./../../jobs/notifications/euler/sendHealthNotifications";
 import { NotificationService } from "../apn";
 import { EulerHealthNotification, EulerIRNotification } from "@prisma/client";
@@ -109,18 +110,22 @@ export class EulerNotificationService {
       };
     })[]
   > {
-    return await db.eulerHealthNotification.findMany({
-      where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
-      include: {
-        account: {
-          select: {
-            address: true,
-            deviceId: true,
-            name: true,
+    try {
+      return await db.eulerHealthNotification.findMany({
+        where: { isActive: true, deviceId: { not: "NOTIFICATIONS_DISABLED" } },
+        include: {
+          account: {
+            select: {
+              address: true,
+              deviceId: true,
+              name: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (err) {
+      throw new DatabaseError(err);
+    }
   }
 
   async sendHealthNotifications() {
