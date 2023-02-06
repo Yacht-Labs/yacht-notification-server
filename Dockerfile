@@ -5,5 +5,4 @@ RUN npm ci
 COPY . .
 EXPOSE 3000
 RUN npx prisma generate
-RUN npm run db-deploy
-CMD ["npm", "run", "start-production"]
+CMD ["npm", "run", "start:migrate:prod"]
