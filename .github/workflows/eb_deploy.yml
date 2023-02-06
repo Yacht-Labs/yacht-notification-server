@@ -1,7 +1,7 @@
 name: EB deploy
 on:
   workflow_run:
-    workflows: [Run Tests]
+    workflows: [Never]
     types:
       - completed
   workflow_dispatch:
