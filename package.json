@@ -20,7 +20,7 @@
     "db-seed": "ts-node prisma/scripts/seedScript.ts",
     "db-resolve": "ts-node prisma/scripts/resolveScript.ts",
     "dev": "nodemon src/server/index.ts",
-    "start-production": "npm run db-deploy && npm start"
+    "start:migrate:prod": "npm run db-deploy && npm start"
   },
   "author": "Yacht Labs Inc.",
   "license": "ISC",
