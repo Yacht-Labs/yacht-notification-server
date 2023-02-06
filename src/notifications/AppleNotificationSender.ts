@@ -1,16 +1,17 @@
+import { NotificationSender } from "./NotificationSender";
 import {
   getApnAuthKey,
   getApnBundleName,
   getApnKeyId,
   getApnTeamId,
-  isProduction,
 } from "./../utils/environment";
 import apn from "apn";
 import logger from "../utils/Logging/logger";
 import { NotificationType } from "../types";
 import db from "../../prisma/db";
+import { NotificationError } from "../types/errors";
 
-export class NotificationService {
+export class AppleNotificationSender implements NotificationSender {
   private provider: apn.Provider;
   constructor() {
     this.provider = new apn.Provider({
@@ -28,7 +29,7 @@ export class NotificationService {
     notificationId: string,
     notificationType: NotificationType
   ): Promise<boolean> {
-    logger.info("Sending notification");
+    console.info("Sending notification");
     const note = new apn.Notification();
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
     note.alert = message;
@@ -51,8 +52,7 @@ export class NotificationService {
       }
       return res.sent[0] ? true : false;
     } catch (err) {
-      logger.error(err);
-      return false;
+      throw new NotificationError(err);
     }
   }
 }

@@ -94,21 +94,21 @@ describe("Euler Service", () => {
       expect(prismaMock.token.update).toHaveBeenCalledTimes(0);
     });
 
-    it("should create a token if it doesn't exist", async () => {
+    it("Should create a token if it doesn't exist", async () => {
       prismaMock.token.findFirst.mockResolvedValue(null);
       await EulerService.updateTokenList();
       expect(prismaMock.token.create).toHaveBeenCalledTimes(1);
       expect(prismaMock.token.update).toHaveBeenCalledTimes(0);
     });
 
-    it("should update a token if it exists and doesn't have euler in protocols", async () => {
+    it("Should update a token if it exists and doesn't have euler in protocols", async () => {
       prismaMock.token.findFirst.mockResolvedValue({ ...TOKEN, protocols: [] });
       await EulerService.updateTokenList();
       expect(prismaMock.token.create).toHaveBeenCalledTimes(0);
       expect(prismaMock.token.update).toHaveBeenCalledTimes(1);
     });
 
-    it("should not update a token if it exists and has euler in protocols", async () => {
+    it("Should not update a token if it exists and has euler in protocols", async () => {
       prismaMock.token.findFirst.mockResolvedValue(TOKEN);
       await EulerService.updateTokenList();
       expect(prismaMock.token.create).toHaveBeenCalledTimes(0);

@@ -24,7 +24,7 @@ export class SquidService {
   }
 
   public static async updateTokenList() {
-    console.log("...Updating Squid tokens...");
+    logger.info("...Updating Squid tokens...");
     const response = await fetch("https://api.0xsquid.com/v1/tokens");
     const { tokens }: { tokens: TokenData[] } = await response.json();
     if (!tokens) return;
@@ -81,6 +81,6 @@ export class SquidService {
         logger.error(new DatabaseError(`Error updating squid token: ${err}`));
       }
     }
-    console.log("...Finished updating Squid tokens\n");
+    logger.info("...Finished updating Squid tokens\n");
   }
 }

@@ -17,16 +17,6 @@ export function getSubAccountIdFromAccount(
   );
 }
 
-export function getSubAccountAddressFromAccount(
-  primary: string,
-  subAccountId: string
-) {
-  return utils.hexZeroPad(
-    BigNumber.from(primary).xor(subAccountId).toHexString(),
-    20
-  );
-}
-
 export const formatAPY = (rawAPY: string): number => {
   if (rawAPY === "0") return 0;
   const diff = rawAPY.length - 26;
