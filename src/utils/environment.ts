@@ -1,6 +1,8 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
+console.log("Environment: ", process.env);
+
 const getStringEnv = (key: string) => {
   const val = process.env[key];
   if (!val) {
@@ -23,7 +25,7 @@ export const getApnAuthKey = (): string => {
 };
 
 export const isProduction = (): boolean => {
-  return process.env.PRODUCTION === "true" ? true : false;
+  return process.env.NODE_ENV === "PRODUCTION" ? true : false;
 };
 
 export const isTest = (): boolean => {
