@@ -27,9 +27,9 @@ model Token {
   price      String?
   decimals   Int
   logoURI    String?
-  extensions Json?
+  protocols  String[]
+  extensions Json? 
   EulerToken EulerToken[]
-
   @@unique([address, chainId])
 }
 

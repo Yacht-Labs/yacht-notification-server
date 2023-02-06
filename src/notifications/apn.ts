@@ -6,7 +6,7 @@ import {
   isProduction,
 } from "./../utils/environment";
 import apn from "apn";
-import logger from "../utils/logger";
+import logger from "../utils/Logging/logger";
 import { NotificationType } from "../types";
 import db from "../../prisma/db";
 
