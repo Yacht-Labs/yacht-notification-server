@@ -51,7 +51,7 @@
     "express": "^4.18.1",
     "graphql": "^16.6.0",
     "graphql-request": "^4.3.0",
-    "ipfs-core": "^0.18.0",
+    "ipfs-core": "^0.14.0",
     "lit-swap-sdk": "^1.1.13",
     "morgan": "^1.10.0",
     "morgan-json": "^1.1.0",
