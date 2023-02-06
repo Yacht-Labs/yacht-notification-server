@@ -44,7 +44,7 @@ export class EulerNotificationService {
     }
     if (params.lowerThreshold) {
       if (
-        params.realAPY <=
+        params.realAPY >=
         params.notificationAPY * (1 - params.lowerThreshold / 100)
       ) {
         notificationText = `The Euler ${params.type}APY on ${params.symbol} is now ${params.realAPY}%`;
@@ -52,7 +52,7 @@ export class EulerNotificationService {
     }
     if (params.upperThreshold) {
       if (
-        params.realAPY >=
+        params.realAPY <=
         params.notificationAPY * (1 + params.upperThreshold / 100)
       ) {
         notificationText = `The Euler ${params.type}APY on ${params.symbol} is now ${params.realAPY}%`;
