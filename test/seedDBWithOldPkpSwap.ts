@@ -35,8 +35,8 @@ const litActionCode = litSdk.createERC20SwapLitAction(
   const pkpInfoUpdate = { ...pkpInfo, pkpPublicKey: pkpInfo.publicKey };
   await db.litPkpSwap.create({
     data: {
-      chainAParams: JSON.stringify(chainAParams),
-      chainBParams: JSON.stringify(chainBParams),
+      chainAParams: chainAParams,
+      chainBParams: chainBParams,
       ipfsCID,
       pkpPublicKey: pkpInfoUpdate.pkpPublicKey,
       address: pkpInfoUpdate.address,
