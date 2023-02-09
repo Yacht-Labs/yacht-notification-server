@@ -39,7 +39,6 @@ export class SquidService {
         });
         if (!tokenDbEntry) {
           try {
-            if (!token.decimals) continue;
             await db.token.create({
               data: {
                 address: token.address,
@@ -47,7 +46,7 @@ export class SquidService {
                 logoURI: token.logoURI || "",
                 name: token.name,
                 symbol: token.symbol,
-                decimals: token.decimals,
+                decimals: Number(token.decimals),
                 protocols: ["squid"],
               },
             });

@@ -54,9 +54,11 @@ router.post("/mintSwapPkp", async (req, res) => {
       if (!checkParams(chainAParams) || !checkParams(chainBParams)) {
         return res.status(400).send("Invalid params");
       }
+      const originTime = Date.now();
       const litActionCode = litSdk.createERC20SwapLitAction(
         chainAParams,
-        chainBParams
+        chainBParams,
+        originTime
       );
       const ipfsCID = (
         await ipfs.add(litActionCode, { onlyHash: true })
@@ -70,6 +72,7 @@ router.post("/mintSwapPkp", async (req, res) => {
           pkpPublicKey: pkpInfoUpdate.pkpPublicKey,
           ipfsCID,
           address: pkpInfoUpdate.address,
+          originTime: originTime.toString(),
         },
       });
       return res.json({ ipfsCID, ...pkpInfo, pkpPublicKey: pkpInfo.publicKey });
@@ -112,7 +115,8 @@ router.post("/runLitAction", async (req, res) => {
       }
       const code = litSdk.createERC20SwapLitAction(
         litPkpSwap.chainAParams,
-        litPkpSwap.chainBParams
+        litPkpSwap.chainBParams,
+        Number(litPkpSwap.originTime)
       );
       const litActionCodeResponse = await litSdk.runLitAction({
         pkpPublicKey,
@@ -133,6 +137,7 @@ router.post("/runLitAction", async (req, res) => {
 // create a route /lit/swapObjects/:counterPartyAddress that gets all litPkpSwap objects with the correct counterPartyAddress
 router.get("/swapObjects/:counterPartyAddress", async (req, res) => {
   const { counterPartyAddress } = req.params;
+
   // check that counterPartyAddress is a valid address
   if (counterPartyAddress.length !== 42) {
     return res.status(400).send("Invalid counterPartyAddress");

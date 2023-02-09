@@ -57,6 +57,7 @@ describe("Lit Swap Routes", () => {
     pkpPublicKey: "0x1234",
     ipfsCID: "0x1234",
     address: "0x1234",
+    originTime: Date.now().toString(),
   };
 
   describe("/mintSwapPkp", () => {

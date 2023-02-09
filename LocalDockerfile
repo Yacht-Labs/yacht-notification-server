@@ -1,8 +1,8 @@
-FROM node:16.13.2
+FROM node:18
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
 COPY . .
 EXPOSE 3000
 RUN npx prisma generate
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:migrate:dev"]
