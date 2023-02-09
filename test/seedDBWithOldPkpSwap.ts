@@ -21,10 +21,12 @@ const chainBParams = {
   decimals: 18,
 };
 
+const originTime = new Date().setDate(new Date().getDate() - 4);
+
 const litActionCode = litSdk.createERC20SwapLitAction(
   chainAParams,
   chainBParams,
-  new Date().getTime() - 4 * 24 * 60 * 60 * 1000
+  originTime
 );
 (async () => {
   const ipfs = await create({ start: false, offline: true });
@@ -40,6 +42,7 @@ const litActionCode = litSdk.createERC20SwapLitAction(
       ipfsCID,
       pkpPublicKey: pkpInfoUpdate.pkpPublicKey,
       address: pkpInfoUpdate.address,
+      originTime: originTime.toString(),
     },
   });
 })();

@@ -95,5 +95,5 @@ model LitPkpSwap {
   chainBParams Json
   address      String
   ipfsCID      String
-  originTime   Int
+  originTime   String
 }
