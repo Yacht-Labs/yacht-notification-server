@@ -73,6 +73,25 @@ describe("Squid Service", () => {
     expect(prismaMock.token.update).toHaveBeenCalledTimes(0);
   });
 
+  it("Should convert decimals to numbers", async () => {
+    mockJsonResponse.mockResolvedValue({
+      tokens: [
+        {
+          chainId: 42220,
+          address: "0x617f3112bf5397D0467D315cC709EF968D9ba546",
+          name: "Tether USD | Wormhole",
+          symbol: "USDT.wh",
+          decimals: "6",
+          logoURI:
+            "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
+          coingeckoId: "tether",
+        },
+      ],
+    });
+    await SquidService.updateTokenList();
+    expect(prismaMock.token.create).toHaveBeenCalledTimes(1);
+  });
+
   it("Should create a token if it doesn't exist", async () => {
     prismaMock.token.findFirst.mockResolvedValue(null);
     await SquidService.updateTokenList();
