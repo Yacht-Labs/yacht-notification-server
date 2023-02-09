@@ -72,7 +72,6 @@ export class EulerService {
           },
         });
         if (!tokenDbEntry) {
-          console.log({ tokenDbEntry });
           try {
             await db.token.create({
               data: {
