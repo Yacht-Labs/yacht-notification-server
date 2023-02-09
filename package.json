@@ -22,6 +22,7 @@
     "db-resolve": "ts-node prisma/scripts/resolveScript.ts",
     "dev": "nodemon src/server/index.ts",
     "start:migrate:prod": "npm run db-deploy && npm start",
+    "start:migrate:dev": "prisma migrate dev && npm run dev",
     "start:seed:hank": "ts-node test/seedDBWithOldPkpSwap.ts && npm start"
   },
   "author": "Yacht Labs Inc.",

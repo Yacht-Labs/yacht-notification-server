@@ -5,5 +5,5 @@ RUN npm ci
 COPY . .
 EXPOSE 3000
 RUN npx prisma generate
-CMD ["npm", "run", "start:seed:hank"]
+CMD ["npm", "run", "start:migrate:dev"]
 # CMD ["npm", "start"]
