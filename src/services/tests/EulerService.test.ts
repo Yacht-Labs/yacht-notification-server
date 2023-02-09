@@ -2,6 +2,7 @@ import { prismaMock } from "../../../test/singleton";
 import { asset, EulerService } from "../EulerService";
 import fetch from "node-fetch";
 import { TokenInfo } from "../../types/Euler";
+import { Token } from "@prisma/client";
 
 const mockJsonFetchResponse = jest.fn();
 const mockGraphqlRequest = jest.fn();
@@ -30,7 +31,7 @@ const TOKEN = {
   protocols: ["euler"],
   price: null,
   extensions: null,
-};
+} as Token;
 
 const asset: asset = {
   id: "0x03ab458634910aad20ef5f1c8ee96f1d6ac54919",
