@@ -20,13 +20,11 @@ import {
   ProviderError,
   YachtError,
 } from "../../../types/errors";
-import {
-  getErrorMessage,
-  getSubAccountAddressFromAccount,
-} from "../../../utils/";
-import logger from "../../../utils/logger";
+import { getErrorMessage } from "../../../utils/";
+import logger from "../../../utils/Logging/logger";
 import { EulerToken, Token } from "@prisma/client";
 import { getSubAccountIdFromAccount } from "../../../utils";
+import { EulerService } from "../../../services/EulerService";
 
 const router = express.Router();
 
@@ -158,9 +156,10 @@ const getEulerAccountBalances = async (
       logger.error(healthScore.message);
       return healthScore;
     }
+    const eulerService = new EulerService();
     accountInfo.push({
       subAccountId: getSubAccountIdFromAccount(topLevelAccountId, account.id),
-      subAccountAddress: getSubAccountAddressFromAccount(
+      subAccountAddress: EulerService.getSubAccountAddressFromAccount(
         topLevelAccountId,
         getSubAccountIdFromAccount(topLevelAccountId, account.id).toString()
       ),

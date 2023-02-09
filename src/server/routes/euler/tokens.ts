@@ -6,7 +6,7 @@ import * as eulerLensContract from "../../../constants/abis/eulerLens.json";
 import { DatabaseResult, ProviderResult } from "../../../types/results";
 import { DatabaseError, ProviderError } from "../../../types/errors";
 import { getErrorMessage } from "../../../utils/";
-import logger from "../../../utils/logger";
+import logger from "../../../utils/Logging/logger";
 import { EulerToken, Token } from "@prisma/client";
 
 const router = express.Router();

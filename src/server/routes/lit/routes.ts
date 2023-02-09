@@ -3,6 +3,7 @@ import litSdk from "./sdk";
 import { create } from "ipfs-core";
 import db from "../../../../prisma/db";
 import { BigNumber } from "ethers";
+import logger from "../../../utils/Logging/logger";
 type LitERC20SwapParam = {
   counterPartyAddress: string;
   tokenAddress: string;
@@ -50,12 +51,18 @@ router.post("/mintSwapPkp", async (req, res) => {
         chainBParams,
       }: { chainAParams: LitERC20SwapParam; chainBParams: LitERC20SwapParam } =
         req.body;
+      chainAParams.counterPartyAddress =
+        chainAParams.counterPartyAddress.toLowerCase();
+      chainBParams.counterPartyAddress =
+        chainBParams.counterPartyAddress.toLowerCase();
       if (!checkParams(chainAParams) || !checkParams(chainBParams)) {
         return res.status(400).send("Invalid params");
       }
+      const originTime = Date.now();
       const litActionCode = litSdk.createERC20SwapLitAction(
         chainAParams,
-        chainBParams
+        chainBParams,
+        originTime
       );
       const ipfsCID = (
         await ipfs.add(litActionCode, { onlyHash: true })
@@ -69,17 +76,18 @@ router.post("/mintSwapPkp", async (req, res) => {
           pkpPublicKey: pkpInfoUpdate.pkpPublicKey,
           ipfsCID,
           address: pkpInfoUpdate.address,
+          originTime: originTime.toString(),
         },
       });
       return res.json({ ipfsCID, ...pkpInfo, pkpPublicKey: pkpInfo.publicKey });
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       return res.sendStatus(500);
     } finally {
       await ipfs.stop();
     }
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.sendStatus(500);
   }
 });
@@ -111,7 +119,8 @@ router.post("/runLitAction", async (req, res) => {
       }
       const code = litSdk.createERC20SwapLitAction(
         litPkpSwap.chainAParams,
-        litPkpSwap.chainBParams
+        litPkpSwap.chainBParams,
+        Number(litPkpSwap.originTime)
       );
       const litActionCodeResponse = await litSdk.runLitAction({
         pkpPublicKey,
@@ -119,20 +128,20 @@ router.post("/runLitAction", async (req, res) => {
         chainAGasConfig,
         chainBGasConfig,
       });
-      console.log(litActionCodeResponse);
       return res.json(litActionCodeResponse);
     } else {
       res.status(400).send("Invalid PKP public key");
     }
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.sendStatus(500);
   }
 });
 
 // create a route /lit/swapObjects/:counterPartyAddress that gets all litPkpSwap objects with the correct counterPartyAddress
 router.get("/swapObjects/:counterPartyAddress", async (req, res) => {
-  const { counterPartyAddress } = req.params;
+  let { counterPartyAddress } = req.params;
+  counterPartyAddress = counterPartyAddress.toLowerCase();
   // check that counterPartyAddress is a valid address
   if (counterPartyAddress.length !== 42) {
     return res.status(400).send("Invalid counterPartyAddress");
@@ -158,7 +167,7 @@ router.get("/swapObjects/:counterPartyAddress", async (req, res) => {
     });
     return res.json(litPkpSwaps);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.sendStatus(500);
   }
 });
@@ -172,7 +181,7 @@ router.get("/swapObject/:pkpPublicKey", async (req, res) => {
     });
     return res.json(litPkpSwap);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.sendStatus(500);
   }
 });

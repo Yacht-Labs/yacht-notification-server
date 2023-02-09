@@ -19,7 +19,7 @@ If you have to run any migrations in the future, just run `npm run db-migrate NA
 
 To initialize the token database, run `npm run db-init`
 
-You should now have token data in your db
+You Should now have token data in your db
 
 To view the database data within your web browser(Prisma Studio), run `npm run db-view`
 

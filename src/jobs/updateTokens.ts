@@ -1,11 +1,11 @@
 import { TokenInfo } from "./../types/Euler";
 import db from "../../prisma/db";
-import logger from "../utils/logger";
+import logger from "../utils/Logging/logger";
 import fetch from "node-fetch";
 
 export const updateTokenList = async () => {
   try {
-    console.log("...Updating all tokens...");
+    logger.info("...Updating all tokens...");
     const response = await fetch(
       "https://raw.githubusercontent.com/euler-xyz/euler-tokenlist/master/euler-tokenlist.json"
     );
@@ -35,7 +35,7 @@ export const updateTokenList = async () => {
         }
       }
     }
-    console.log("...Finished updating all tokens\n");
+    logger.info("...Finished updating all tokens\n");
   } catch (err) {
     logger.error(err);
   }

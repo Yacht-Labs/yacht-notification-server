@@ -1,6 +1,6 @@
 import express from "express";
 import db from "../../../../../prisma/db";
-import logger from "../../../../utils/logger";
+import logger from "../../../../utils/Logging/logger";
 const router = express.Router();
 
 router.post("/", async (req, res) => {

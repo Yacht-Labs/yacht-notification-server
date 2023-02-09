@@ -27,6 +27,7 @@ model Token {
   price      String?
   decimals   Int
   logoURI    String?
+  protocols  String[]
   extensions Json?
   EulerToken EulerToken[]
 
@@ -94,4 +95,5 @@ model LitPkpSwap {
   chainBParams Json
   address      String
   ipfsCID      String
+  originTime   String
 }
