@@ -44,7 +44,7 @@ describe("Squid Service", () => {
     });
   });
 
-  afterAll(() => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 

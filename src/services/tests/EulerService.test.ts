@@ -68,7 +68,7 @@ describe("Euler Service", () => {
       });
     });
 
-    afterAll(() => {
+    afterEach(() => {
       jest.clearAllMocks();
     });
 
