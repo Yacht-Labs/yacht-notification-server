@@ -5,7 +5,7 @@ import {
   ProviderError,
 } from "./../../../../types/errors";
 import { prismaMock } from "../../../../../test/singleton";
-import { prisma, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { EulerNotificationService } from "../../../../notifications/euler/EulerNotificationService";
 import {
   EulerHealthNotificationWithAccount,
