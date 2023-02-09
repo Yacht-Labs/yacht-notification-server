@@ -51,6 +51,10 @@ router.post("/mintSwapPkp", async (req, res) => {
         chainBParams,
       }: { chainAParams: LitERC20SwapParam; chainBParams: LitERC20SwapParam } =
         req.body;
+      chainAParams.counterPartyAddress =
+        chainAParams.counterPartyAddress.toLowerCase();
+      chainBParams.counterPartyAddress =
+        chainBParams.counterPartyAddress.toLowerCase();
       if (!checkParams(chainAParams) || !checkParams(chainBParams)) {
         return res.status(400).send("Invalid params");
       }
@@ -136,8 +140,8 @@ router.post("/runLitAction", async (req, res) => {
 
 // create a route /lit/swapObjects/:counterPartyAddress that gets all litPkpSwap objects with the correct counterPartyAddress
 router.get("/swapObjects/:counterPartyAddress", async (req, res) => {
-  const { counterPartyAddress } = req.params;
-
+  let { counterPartyAddress } = req.params;
+  counterPartyAddress = counterPartyAddress.toLowerCase();
   // check that counterPartyAddress is a valid address
   if (counterPartyAddress.length !== 42) {
     return res.status(400).send("Invalid counterPartyAddress");
