@@ -13,6 +13,7 @@
     "start": "tsc && node ./out/src/server/index.js",
     "dev": "nodemon src/server/index.ts",
     "start:migrate:prod": "prisma migrate deploy && npm start",
+    "start:reset:prod": "prisma migrate reset --force && npm start",
     "start:migrate:dev": "prisma migrate dev && npm start"
   },
   "author": "Yacht Labs Inc.",
