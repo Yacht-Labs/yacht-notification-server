@@ -1,8 +1,6 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
-console.log("NODE_ENV", process.env);
-
 const getStringEnv = (key: string) => {
   const val = process.env[key];
   if (!val) {

@@ -2,7 +2,6 @@ import request from "supertest";
 import { app, server } from "../../index";
 import { YachtLitSdk } from "lit-swap-sdk";
 import { prismaMock } from "../../../../test/singleton";
-import { dnsEncode } from "ethers/lib/utils";
 
 const mockMintGrantBurn = jest.fn().mockResolvedValue({
   tokenId: "0x1234",

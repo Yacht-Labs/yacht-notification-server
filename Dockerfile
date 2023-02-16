@@ -5,4 +5,4 @@ RUN npm ci
 COPY . .
 EXPOSE 3000
 RUN npx prisma generate
-CMD ["npm", "start"]
+CMD ["npm", "start:migrate:prod"]
