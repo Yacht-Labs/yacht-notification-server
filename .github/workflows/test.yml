@@ -3,8 +3,8 @@ name: Run Tests
 on:
   push:
     branches:
+      - "*" # This is a wildcard that matches any branch name
       - "!master"
-      - "**" # This is a wildcard that matches any branch name
 
 jobs:
   build:
